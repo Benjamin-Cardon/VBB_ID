@@ -11,6 +11,7 @@ const login_1 = __importDefault(require("./routes/login"));
 const patron_1 = __importDefault(require("./routes/patron"));
 const portal_1 = __importDefault(require("./routes/portal"));
 const client_1 = __importDefault(require("./data/client"));
+const bodyParser = require('body-parser');
 var session = require('express-session');
 dotenv_1.default.config();
 client_1.default.connect().then(() => {
@@ -23,6 +24,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+app.use(bodyParser.json());
 app.get("/", (req, res, next) => {
     try {
         res.send("index.html");

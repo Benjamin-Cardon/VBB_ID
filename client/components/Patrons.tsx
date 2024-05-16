@@ -1,6 +1,8 @@
 import React from "react";
 import { useState } from "react";
-function Patrons() {
+import { props } from "../App";
+import { Button } from "@mui/material";
+function Patrons(patron_props: props) {
   const [search_text, set_search_text] = useState('');
   const [displayed_patrons, set_displayed_patrons] = useState([{}]);
   const [profile_edits, set_profile_edits] = useState({});
@@ -22,7 +24,7 @@ function Patrons() {
 
   }
 
-  return (<div></div>);
+  return (<div><Button onClick={(e) => { patron_props.changePage('LibrarianMenu') }}>Main Menu</Button></div>);
 }
 
 export default Patrons

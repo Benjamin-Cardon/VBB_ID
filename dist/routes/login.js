@@ -16,10 +16,20 @@ const express = require('express');
 const login = express.Router();
 const client_1 = __importDefault(require("../data/client"));
 login.post('/attempt', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { username, password } = req.body;
+    const { password, username, library } = req.body;
+    console.log(username, password, library);
     const result = yield client_1.default.query('SELECT * FROM librarians WHERE username = $1 AND password = $2', [username, password]);
     const user = result.rows[0];
-    console.log(user);
+    //console.log(user);
+    if (!user) {
+        res.send("Incorrect Login");
+    }
+    else {
+        const insert = yield client_1.default.query('INSERT INTO librarian_logins (librarian_id, session_id) VALUES ($1, $2)', [user.id, req.sessionID]);
+        console.log(insert);
+        res.send(req.sessionID);
+    }
+    console.log("User logged in with this Session ID:", req.sessionID);
 }));
 login.get('/libraries', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let result = yield client_1.default.query("SELECT * FROM public.libraries");

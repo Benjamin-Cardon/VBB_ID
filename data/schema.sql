@@ -1,8 +1,9 @@
 CREATE TABLE IF NOT EXISTS public.patrons
 (
+    patron_id character varying(255) COLLATE pg_catalog."default" PRIMARY KEY NOT NULL,
+    library_id bigint NOT NULL,
     first_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     last_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    library_id bigint NOT NULL,
     gender character varying(255) COLLATE pg_catalog."default" NOT NULL,
     date_of_birth date,
     grade_level integer,
@@ -36,7 +37,7 @@ CREATE TABLE IF NOT EXISTS public.librarians
 CREATE TABLE IF NOT EXISTS public.attendance_log
 (
   id bigserial NOT NULL,
-  patron_id bigint NOT NULL,
+  patron_id character varying(255) COLLATE pg_catalog."default" NOT NULL,
   library_id bigint NOT NULL,
   time_attended date
 );
@@ -54,6 +55,39 @@ CREATE TABLE IF NOT EXISTS public.libraries
     postal_code character varying(255) COLLATE pg_catalog."default",
     state_province character varying(255) COLLATE pg_catalog."default"
 );
+
+ALTER TABLE librarians
+ADD CONSTRAINT pk_librarians_id PRIMARY KEY (id);
+
+ALTER TABLE librarians
+ADD CONSTRAINT fk_librarians_belong_to_libraries FOREIGN KEY (library_id) REFERENCES libraries(id)
+
+ALTER TABLE patrons
+ADD CONSTRAINT fk_patrons_belong_to_libraries FOREIGN KEY (library_id) REFERENCES libraries(id)
+
+
+ALTER TABLE attendance_log
+ADD CONSTRAINT fk_attendance_done_by_patron FOREIGN KEY (patron_id) REFERENCES patrons(patron_id)
+
+ALTER TABLE attendance_log
+ADD CONSTRAINT fk_attendance_at_library FOREIGN KEY (library_id) REFERENCES libraries(id)
+
+ALTER TABLE librarian_logins
+ADD COLUMN librarian_id BIGINT, -- Change the data type according to your requirements
+ADD CONSTRAINT fk_librarian_id FOREIGN KEY (librarian_id) REFERENCES librarians(id);
+
+ALTER TABLE attendance_log
+ALTER COLUMN time_attended SET DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE librarian_logins
+ADD PRIMARY KEY (session_id);
+
+ALTER TABLE attendance_log
+ADD PRIMARY KEY (id);
+
+ALTER TABLE libraries
+ADD PRIMARY KEY (id);
+
 
 
 /*CREATE TABLE IF NOT EXISTS public.profiles_studentprofile

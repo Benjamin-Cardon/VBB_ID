@@ -6,6 +6,7 @@ import login from "./routes/login";
 import patron from "./routes/patron";
 import portal from "./routes/portal";
 import client from './data/client';
+const bodyParser = require('body-parser')
 var session = require('express-session')
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }));
+app.use(bodyParser.json());
 
 app.get("/", (req: Request, res: Response, next: NextFunction): void => {
   try {
