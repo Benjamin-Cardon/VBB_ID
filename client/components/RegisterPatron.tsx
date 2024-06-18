@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from "react";
 import { useState } from "react";
-import { TextField, FormControl, RadioGroup, Radio, FormLabel, FormControlLabel, Select, Button, MenuItem, SelectChangeEvent, Stack, Divider, Container, Box } from "@mui/material";
+import { TextField, FormControl, RadioGroup, Radio, FormLabel, FormControlLabel, Select, Button, MenuItem, SelectChangeEvent, Stack, Divider, Container, Box, Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText } from "@mui/material";
 import { props } from "../App";
 import { family_members, register_state, family_status, family_members_with_income } from "../types";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -54,11 +54,21 @@ function RegisterPatron(register_props: props) {
   const [has_portal, set_has_portal] = useState(false);
   const [portal_form, set_portal_form] = useState({});
   const [error_state, set_error_state] = useState(init_errors);
-
+  const [open, setOpen] = useState(false);
+  const [code, setCode] = useState("");
   void function get_portal() {
 
 
   }
+
+  const handleClickOpen = (devCode: string) => {
+    setOpen(true);
+    setCode(devCode);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   function register() {
     let new_errors = { ...error_state }
@@ -90,7 +100,22 @@ function RegisterPatron(register_props: props) {
         },
         body: JSON.stringify({ register_form: form_state, session_id })
       }).then(async (res) => {
-        console.log("response recieved")
+        let stringified_body: string = '';
+        if (res.body != null) {
+          let reader = res.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          while (true) {
+            let { done, value } = await reader.read();
+            if (value != undefined) {
+              stringified_body = stringified_body.concat(decoder.decode(value));
+              console.log(stringified_body);
+            }
+            if (done) {
+              break;
+            }
+          }
+        }
+        handleClickOpen(stringified_body)
       })
     }
   }
@@ -119,7 +144,26 @@ function RegisterPatron(register_props: props) {
     <Button onClick={(e) => { register_props.changePage('LibrarianMenu') }}>Main Menu</Button>
     <Container maxWidth='md'>
       <Box display="flex" flexDirection="column" alignItems="center">
-
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description">
+          <DialogTitle id="alert-dialog-title">
+            {"Your Patron ID"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Please write this down! You will need to use this code to login to the libarary. Your code is: {code}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Disagree</Button>
+            <Button onClick={handleClose} autoFocus>
+              Agree
+            </Button>
+          </DialogActions>
+        </Dialog>
         <Stack
           direction="column"
           divider={<Divider orientation="horizontal" flexItem />}

@@ -1,7 +1,9 @@
 import React from "react";
 import { useState } from "react";
 import { props } from "../App";
-import { Button } from "@mui/material";
+import { Button, Box, Container, TextField, Typography } from "@mui/material";
+import Patron from "./Patron";
+
 function Patrons(patron_props: props) {
   const [search_text, set_search_text] = useState('');
   const [displayed_patrons, set_displayed_patrons] = useState([{}]);
@@ -24,7 +26,20 @@ function Patrons(patron_props: props) {
 
   }
 
-  return (<div><Button onClick={(e) => { patron_props.changePage('LibrarianMenu') }}>Main Menu</Button></div>);
+  return (<Box>
+    <Box>
+      <Button onClick={(e) => { patron_props.changePage('LibrarianMenu') }}>Main Menu</Button>
+    </Box>
+    <Container>
+      <Typography />
+      <TextField />
+    </Container>
+    <Container>
+      {displayed_patrons.map((patron) => {
+        return (<Patron />)
+      })}
+    </Container>
+  </Box>);
 }
 
 export default Patrons
