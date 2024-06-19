@@ -3,10 +3,10 @@ import { useState } from "react";
 import { props } from "../App";
 import { Button, Box, Container, TextField, Typography } from "@mui/material";
 import Patron from "./Patron";
-
+import { patron } from "../types";
 function Patrons(patron_props: props) {
   const [search_text, set_search_text] = useState('');
-  const [displayed_patrons, set_displayed_patrons] = useState([{}]);
+  const [displayed_patrons, set_displayed_patrons] = useState([]);
   const [profile_edits, set_profile_edits] = useState({});
   const [edit_box, set_edit_box] = useState({})
   const [portal_users, set_portal_users] = useState([{}]);
@@ -43,3 +43,27 @@ function Patrons(patron_props: props) {
 }
 
 export default Patrons
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

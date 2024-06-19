@@ -1,4 +1,5 @@
 import { Dayjs } from "dayjs";
+import internal from "stream";
 
 export type state_toggle = true | false | null;
 export type grade_level = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12' | 'College/University';
@@ -41,5 +42,10 @@ export interface register_state {
   desired_library_resource: desired_library_resource | "";
   library_attendance_goal: library_attendance_goal | "";
 }
-
+export type patron = {
+  patron_id: string;
+  last_login: Dayjs | null;
+  count_logins: Number;
+  profile: register_state;
+}
 
