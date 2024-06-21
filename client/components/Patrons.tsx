@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { props } from "../App";
-import { Button, Box, Container, TextField, Typography } from "@mui/material";
+import { Button, Box, Container, TextField, Typography, Pagination } from "@mui/material";
 import Patron from "./Patron";
 import { patron } from "../types";
 const patron_dummy: patron = {
@@ -35,6 +35,7 @@ function Patrons(patron_props: props) {
   const [profile_edits, set_profile_edits] = useState({});
   const [edit_box, set_edit_box] = useState({})
   const [portal_users, set_portal_users] = useState([{}]);
+  const [page, setPage] = useState(1);
   void function on_search_patrons() {
 
   }
@@ -50,6 +51,9 @@ function Patrons(patron_props: props) {
   void function save_edits() {
 
   }
+  function on_page_change(event: React.ChangeEvent<unknown>, page: number) {
+    setPage(page);
+  }
 
   return (<Box>
     <Box>
@@ -63,6 +67,7 @@ function Patrons(patron_props: props) {
       {displayed_patrons.map((patron) => {
         return (<Patron patron={patron} />)
       })}
+      <Pagination count={6} page={page} onChange={on_page_change} />
     </Container>
   </Box>);
 }
