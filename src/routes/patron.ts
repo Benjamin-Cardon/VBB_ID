@@ -30,6 +30,11 @@ patron.post('/register', async (req: Request, res: Response) => {
     res.status(401);
     res.send("Unauthorized Session");
   }
+})
+patron.get('/list', async (req: Request, res: Response) => {
+  console.log("Recieved Request for List")
+  //TODO, add session Checking
+  res.send("You will have troubles until this is a patron object.")
 
 })
 
