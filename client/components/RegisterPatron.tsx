@@ -93,7 +93,7 @@ function RegisterPatron(register_props: props) {
       set_error_state(new_errors);
     } else {
       console.log("Doing A fetch")
-      fetch("http://localhost:3000/patron/register", {
+      fetch("http://localhost:3000/patrons/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

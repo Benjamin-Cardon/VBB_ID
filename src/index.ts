@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import path from "path";
 import attendance from "./routes/attendance";
 import login from "./routes/login";
-import patron from "./routes/patron";
+import patrons from "./routes/patrons";
 import portal from "./routes/portal";
 import client from './data/client';
 const bodyParser = require('body-parser')
@@ -34,7 +34,7 @@ app.get("/", (req: Request, res: Response, next: NextFunction): void => {
   }
 });
 
-app.use('/patron', patron);
+app.use('/patrons', patrons);
 app.use('/login', login);
 app.use('/attendance', attendance);
 app.use('/portal', portal);

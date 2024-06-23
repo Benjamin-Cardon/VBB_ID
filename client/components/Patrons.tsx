@@ -4,7 +4,7 @@ import { props } from "../App";
 import { Button, Box, Container, TextField, Typography, Pagination } from "@mui/material";
 import Patron from "./Patron";
 import { patron } from "../types";
-
+import { useAuth } from "./AuthContext";
 const patron_dummy: patron = {
   patron_id: "Yahoo",
   last_login: null,
@@ -31,6 +31,7 @@ const patron_dummy: patron = {
 }
 
 function Patrons(patron_props: props) {
+  const session_id = useAuth().session_id;
   const [search_text, set_search_text] = useState('');
   const [fetched_patrons, set_fetched_patrons] = useState([] as patron[])
   const [displayed_patrons, set_displayed_patrons] = useState([patron_dummy] as patron[]);
@@ -41,7 +42,7 @@ function Patrons(patron_props: props) {
 
   useEffect(() => {
     console.log("Used Effect")
-    fetch("http://localhost:3000/patron/list")
+    fetch(`http://localhost:3000/patrons/list?session=${session_id}`)
       .then(async (res) => {
         if (res.body != null) {
           let reader = res.body.getReader();

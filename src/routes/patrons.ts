@@ -1,9 +1,10 @@
 const express = require('express')
 import { Request, Response, Router } from "express";
 import client from "../data/client";
-const patron: Router = express.Router()
+import patron from "../../client/types"
+const patrons: Router = express.Router()
 
-patron.post('/register', async (req: Request, res: Response) => {
+patrons.post('/register', async (req: Request, res: Response) => {
   console.log("Recieved Request to Register")
   const { register_form, session_id } = req.body;
   console.log(register_form);
@@ -31,11 +32,18 @@ patron.post('/register', async (req: Request, res: Response) => {
     res.send("Unauthorized Session");
   }
 })
-patron.get('/list', async (req: Request, res: Response) => {
-  console.log("Recieved Request for List")
-  //TODO, add session Checking
-  res.send("You will have troubles until this is a patron object.")
 
+patrons.get('/list', async (req: Request, res: Response) => {
+  let session_id = req.query.session;
+  console.log("Recieved Request for List:", session_id)
+  const result = await client.query("SELECT * FROM librarian_logins WHERE session_id = $1", [session_id])
+  if (result.rows.length == 0) {
+    res.send("No such session");
+    res.status(400);
+  }
+  //TODO, add session Checking
+
+  res.send("You will have troubles until this is an array of patron objects.")
 })
 
 function create_id(library_id: number): string {
@@ -51,4 +59,4 @@ function create_id(library_id: number): string {
   return id;
 }
 
-export default patron;
+export default patrons;
