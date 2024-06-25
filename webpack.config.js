@@ -1,7 +1,12 @@
 const path = require("path");
 
 module.exports = {
-  entry: "./client/index.tsx",
+  entry: {
+    librarian: "./client/librarian.tsx",
+    admin: "./client/admin.tsx",
+    data: "./client/data.tsx"
+  }
+  ,
   module: {
     rules: [
       {
@@ -16,7 +21,7 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
   },
   output: {
-    filename: "bundle.js",
+    filename: '[name].js',
     path: path.resolve(__dirname, "public"),
   },
 };

@@ -6,11 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
-const attendance_1 = __importDefault(require("./routes/attendance"));
-const login_1 = __importDefault(require("./routes/login"));
-const patron_1 = __importDefault(require("./routes/patron"));
-const portal_1 = __importDefault(require("./routes/portal"));
-const client_1 = __importDefault(require("./data/client"));
+const attendance_1 = __importDefault(require("./routes/librarian/attendance"));
+const login_1 = __importDefault(require("./routes/librarian/login"));
+const patrons_1 = __importDefault(require("./routes/librarian/patrons"));
+const portal_1 = __importDefault(require("./routes/librarian/portal"));
+const client_1 = __importDefault(require("./db/client"));
 const bodyParser = require('body-parser');
 var session = require('express-session');
 dotenv_1.default.config();
@@ -25,15 +25,19 @@ app.use(session({
     saveUninitialized: false
 }));
 app.use(bodyParser.json());
-app.get("/", (req, res, next) => {
-    try {
-        res.send("index.html");
-    }
-    catch (error) {
-        next(error);
-    }
+app.get('/admin', (req, res) => {
+    // @ts-ignore
+    res.sendFile("C:\\Users\\18016\\Desktop\\Village Libraries\\public\\admin.html");
 });
-app.use('/patron', patron_1.default);
+app.get('/data', (req, res) => {
+    // @ts-ignore
+    res.sendFile("C:\\Users\\18016\\Desktop\\Village Libraries\\public\\data.html");
+});
+app.get('/librarian', (req, res) => {
+    // @ts-ignore
+    res.sendFile("C:\\Users\\18016\\Desktop\\Village Libraries\\public\\librarian.html");
+});
+app.use('/patrons', patrons_1.default);
 app.use('/login', login_1.default);
 app.use('/attendance', attendance_1.default);
 app.use('/portal', portal_1.default);

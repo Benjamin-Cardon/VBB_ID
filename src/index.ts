@@ -1,11 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import path from "path";
-import attendance from "./routes/attendance";
-import login from "./routes/login";
-import patrons from "./routes/patrons";
-import portal from "./routes/portal";
-import client from './data/client';
+import attendance from "./routes/librarian/attendance";
+import login from "./routes/librarian/login";
+import patrons from "./routes/librarian/patrons";
+import portal from "./routes/librarian/portal";
+import client from './db/client';
 const bodyParser = require('body-parser')
 var session = require('express-session')
 
@@ -26,12 +26,20 @@ app.use(session({
 }));
 app.use(bodyParser.json());
 
-app.get("/", (req: Request, res: Response, next: NextFunction): void => {
-  try {
-    res.send("index.html");
-  } catch (error) {
-    next(error);
-  }
+
+app.get('/admin', (req: Request, res: Response) => {
+  // @ts-ignore
+  res.sendFile("C:\\Users\\18016\\Desktop\\Village Libraries\\public\\admin.html");
+});
+
+app.get('/data', (req: Request, res: Response) => {
+  // @ts-ignore
+  res.sendFile("C:\\Users\\18016\\Desktop\\Village Libraries\\public\\data.html");
+});
+
+app.get('/librarian', (req: Request, res: Response) => {
+  // @ts-ignore
+  res.sendFile("C:\\Users\\18016\\Desktop\\Village Libraries\\public\\librarian.html");
 });
 
 app.use('/patrons', patrons);
