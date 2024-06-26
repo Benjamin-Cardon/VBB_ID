@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { props } from "../Librarian";
-import { Button, Box, Container, TextField, Typography, Pagination } from "@mui/material";
+import { Button, Box, Container, TextField, Typography, Pagination, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import Patron from "./Patron";
 import { patron } from "../../types";
 import { useAuth } from "./AuthContext";
@@ -34,12 +34,11 @@ function Patrons(patron_props: props) {
   const session_id = useAuth().session_id;
   const [search_text, set_search_text] = useState('');
   const [fetched_patrons, set_fetched_patrons] = useState([] as patron[])
+  const [filtered_patrons, set_filtered_patrons] = useState([] as patron[])
   const [displayed_patrons, set_displayed_patrons] = useState([patron_dummy] as patron[]);
-  const [profile_edits, set_profile_edits] = useState({});
-  const [edit_box, set_edit_box] = useState({})
-  const [portal_users, set_portal_users] = useState([{}]);
   const [page, setPage] = useState(0);
   const [page_count, set_page_count] = useState(0);
+  const [orderby, setOrder] = useState('First Name');
 
   useEffect(() => {
     console.log("Used Effect")
@@ -61,34 +60,86 @@ function Patrons(patron_props: props) {
           }
           let patrons = JSON.parse(stringified_body)
           set_fetched_patrons(patrons);
-          set_displayed_patrons(patrons.slice(0, patrons.length > 10 ? 10 : patrons.length));
+          set_filtered_patrons(patrons);
+          setPage(1);
+          set_displayed_patrons(filtered_patrons.slice((page - 1) * 10, page * 10 < filtered_patrons.length ? page * 10 : filtered_patrons.length))
           set_page_count(patrons.length ? Math.ceil(patrons.length / 10) : 1);
-
         }
       })
       .catch(error => {
         console.error('Error reading stream:', error);
       });
   }, []);
+
   useEffect(() => {
-    set_displayed_patrons(fetched_patrons.slice((page - 1) * 10, page * 10 < fetched_patrons.length ? page * 10 : fetched_patrons.length))
+    set_displayed_patrons(filtered_patrons.slice((page - 1) * 10, page * 10 < filtered_patrons.length ? page * 10 : filtered_patrons.length))
   }, [page])
 
-  void function on_search_patrons() {
 
+  let on_search_patrons = function () {
+    let patrons = fetched_patrons.filter((patron) => {
+      let name = patron.profile.first_name + " " + patron.profile.last_name;
+      let searched = search_text.trim();
+      return name.includes(searched)
+    })
+    if (orderby == 'First Name') {
+      patrons.sort((a: patron, b: patron) => {
+        return a.profile.first_name.localeCompare(b.profile.first_name);
+      })
+    } else if (orderby == 'Last Name') {
+      patrons.sort((a: patron, b: patron) => {
+        return a.profile.last_name.localeCompare(b.profile.last_name);
+      })
+    } else if (orderby == 'Count Attendance') {
+      patrons.sort((a: patron, b: patron) => {
+        return Number(a.count_logins) - Number(b.count_logins)
+      })
+    } else if (orderby == 'Time Last Attended (Recent)') {
+      patrons.sort((a: patron, b: patron) => {
+        //TODO FIX
+        if (!a.last_login && !b.last_login) {
+          return 0;
+        }
+        if (!a.last_login) {
+          return -1;
+        }
+        if (!b.last_login) {
+          return 1;
+        }
+        if (a.last_login.isBefore(b.last_login)) {
+          return 1;
+        } else if (b.last_login.isBefore(a.last_login)) {
+          return -1;
+        } else {
+          return 0;
+        }
+      })
+    } else if (orderby == 'Time Last Attended (Far)') {
+      //TODO Fix
+      patrons.sort((a: patron, b: patron) => {
+        if (!a.last_login && !b.last_login) {
+          return 0;
+        }
+        if (!a.last_login) {
+          return 1;
+        }
+        if (!b.last_login) {
+          return -1;
+        }
+        if (a.last_login.isBefore(b.last_login)) {
+          return -1;
+        } else if (b.last_login.isBefore(a.last_login)) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
+    }
+    set_filtered_patrons(patrons);
+    setPage(1);
+    set_displayed_patrons(patrons.slice((page - 1) * 10, page * 10 < patrons.length ? page * 10 : patrons.length))
   }
-  void function on_open_edit() {
 
-  }
-  void function on_open_profile() {
-
-  }
-  void function get_portal_users() {
-
-  }
-  void function save_edits() {
-
-  }
   function on_page_change(event: React.ChangeEvent<unknown>, page: number) {
     setPage(page);
   }
@@ -99,7 +150,24 @@ function Patrons(patron_props: props) {
     </Box>
     <Container>
       <Typography />
-      <TextField />
+      <TextField label="Search Name" value={search_text} onChange={(e) => { set_search_text(e.target.value) }} />
+      <FormControl fullWidth>
+        <InputLabel id="demo-simple-select-label">Order By</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={orderby}
+          label="Order By"
+          onChange={(e) => { setOrder(e.target.value) }}
+        >
+          <MenuItem value={'First Name'}>First Name</MenuItem>
+          <MenuItem value={'Last Name'}>Last Name</MenuItem>
+          <MenuItem value={'Count Attendance'}>Count Attendance</MenuItem>
+          <MenuItem value={'Time Last Attended (Recent)'}>Time Last Attended (Recent)</MenuItem>
+          <MenuItem value={'Time Last Attended (Far)'}>Time Last Attended (Far)</MenuItem>
+        </Select>
+      </FormControl>
+      <Button onClick={on_search_patrons}>Search</Button>
     </Container>
     <Container>
       {displayed_patrons.map((patron) => {
