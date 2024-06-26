@@ -36,12 +36,51 @@ patrons.post('/register', async (req: Request, res: Response) => {
 patrons.get('/list', async (req: Request, res: Response) => {
   let session_id = req.query.session;
   console.log("Recieved Request for List:", session_id)
-  const result = await client.query("SELECT * FROM librarian_logins WHERE session_id = $1", [session_id])
-  if (result.rows.length == 0) {
+  const login_entry = await client.query("SELECT * FROM librarian_logins WHERE session_id = $1", [session_id])
+  let librarian_id, library_id;
+  if (login_entry.rows.length == 0) {
     res.send("No such session");
     res.status(400);
+  } else {
+    librarian_id = login_entry.rows[0].librarian_id;
   }
-  //TODO, add session Checking
+  console.log("Librarian ID", librarian_id)
+  const librarian_entry = await client.query("SELECT * FROM librarians WHERE id = $1", [librarian_id])
+  if (librarian_entry.rows.length == 0) {
+    res.send("Internal Database Error: Mismatch of librarian ID's ");
+    res.status(400);
+  } else {
+    library_id = librarian_entry.rows[0].library_id;
+  }
+  let query_string = `
+    SELECT
+      patrons.*,
+      COALESCE(attendance_counts.attendance_count, 0) AS attendance_count,
+      attendance_counts.most_recent_attendance
+    FROM
+      public.patrons
+    LEFT JOIN (
+      SELECT
+          attendance_log.patron_id,
+          COUNT(attendance_log.id) AS attendance_count,
+          MAX(attendance_log.time_attended) AS most_recent_attendance
+      FROM
+          attendance_log
+      GROUP BY
+          attendance_log.patron_id
+    ) AS attendance_counts
+    ON
+      patrons.patron_id = attendance_counts.patron_id
+    JOIN
+      public.libraries
+    ON
+      patrons.library_id = libraries.id
+    WHERE
+      libraries.id = $1 -- Replace with the specific library ID you want to filter by
+    ORDER BY
+      patron_id DESC;`
+  const patron_list = await client.query(query_string, [library_id])
+  console.log(patron_list.rows);
 
   res.send("You will have troubles until this is an array of patron objects.")
 })
