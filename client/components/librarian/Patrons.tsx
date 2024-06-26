@@ -38,7 +38,8 @@ function Patrons(patron_props: props) {
   const [profile_edits, set_profile_edits] = useState({});
   const [edit_box, set_edit_box] = useState({})
   const [portal_users, set_portal_users] = useState([{}]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
+  const [page_count, set_page_count] = useState(0);
 
   useEffect(() => {
     console.log("Used Effect")
@@ -58,13 +59,20 @@ function Patrons(patron_props: props) {
               break;
             }
           }
-          set_fetched_patrons(JSON.parse(stringified_body));
+          let patrons = JSON.parse(stringified_body)
+          set_fetched_patrons(patrons);
+          set_displayed_patrons(patrons.slice(0, patrons.length > 10 ? 10 : patrons.length));
+          set_page_count(patrons.length ? Math.ceil(patrons.length / 10) : 1);
+
         }
       })
       .catch(error => {
         console.error('Error reading stream:', error);
       });
   }, []);
+  useEffect(() => {
+    set_displayed_patrons(fetched_patrons.slice((page - 1) * 10, page * 10 < fetched_patrons.length ? page * 10 : fetched_patrons.length))
+  }, [page])
 
   void function on_search_patrons() {
 
@@ -97,7 +105,7 @@ function Patrons(patron_props: props) {
       {displayed_patrons.map((patron) => {
         return (<Patron patron={patron} />)
       })}
-      <Pagination count={6} page={page} onChange={on_page_change} />
+      <Pagination count={page_count} page={page} onChange={on_page_change} />
     </Container>
   </Box>);
 }

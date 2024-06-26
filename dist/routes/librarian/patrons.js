@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require('express');
 const client_1 = __importDefault(require("../../db/client"));
+const dayjs_1 = __importDefault(require("dayjs"));
 const patrons = express.Router();
 patrons.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Recieved Request to Register");
@@ -91,10 +92,37 @@ patrons.get('/list', (req, res) => __awaiter(void 0, void 0, void 0, function* (
     WHERE
       libraries.id = $1 -- Replace with the specific library ID you want to filter by
     ORDER BY
-      patron_id DESC;`;
+      first_name ASC;`;
     const patron_list = yield client_1.default.query(query_string, [library_id]);
-    console.log(patron_list.rows);
-    res.send("You will have troubles until this is an array of patron objects.");
+    const cleaned_patron_list = patron_list.rows.map((sql_patron) => {
+        return {
+            patron_id: sql_patron.patron_id,
+            last_login: sql_patron.most_recent_attendance ? (0, dayjs_1.default)(sql_patron.most_recent_attendance) : null,
+            count_logins: sql_patron.attendance_count,
+            profile: {
+                first_name: sql_patron.first_name,
+                last_name: sql_patron.last_name,
+                gender: sql_patron.gender,
+                date: sql_patron.date_of_birth ? (0, dayjs_1.default)(sql_patron.date_of_birth) : null,
+                grade_level: sql_patron.grade_level,
+                family_members: sql_patron.family_members,
+                family_status: sql_patron.family_status,
+                family_members_with_income: sql_patron.family_members_with_income,
+                barriers_to_education: sql_patron.barriers_to_education,
+                family_support_level: sql_patron.family_support_level,
+                favorite_subject: sql_patron.favorite_subject,
+                percieved_most_useful_subject: sql_patron.percieved_most_useful_subject,
+                percieved_most_difficult_subject: sql_patron.percieved_most_difficult_subject,
+                library_discovery_method: sql_patron.library_discovery_method,
+                library_travel_time: sql_patron.library_travel_time,
+                desired_library_resource: sql_patron.desired_library_resources,
+                library_attendance_goal: sql_patron.library_attendance_goal,
+            }
+        };
+    });
+    console.log(cleaned_patron_list);
+    res.status(200);
+    res.send(JSON.stringify(cleaned_patron_list));
 }));
 function create_id(library_id) {
     let id = "";

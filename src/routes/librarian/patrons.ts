@@ -1,7 +1,8 @@
 const express = require('express')
 import { Request, Response, Router } from "express";
 import client from "../../db/client";
-import patron from "../../../client/types"
+import type { patron } from "../../../client/types.d.ts"
+import dayjs, { Dayjs } from "dayjs";
 const patrons: Router = express.Router()
 
 patrons.post('/register', async (req: Request, res: Response) => {
@@ -78,11 +79,39 @@ patrons.get('/list', async (req: Request, res: Response) => {
     WHERE
       libraries.id = $1 -- Replace with the specific library ID you want to filter by
     ORDER BY
-      patron_id DESC;`
+      first_name ASC;`
   const patron_list = await client.query(query_string, [library_id])
-  console.log(patron_list.rows);
+  const cleaned_patron_list = patron_list.rows.map((sql_patron): patron => {
+    return {
+      patron_id: sql_patron.patron_id,
+      last_login: sql_patron.most_recent_attendance ? dayjs(sql_patron.most_recent_attendance) : null,
+      count_logins: sql_patron.attendance_count,
+      profile: {
+        first_name: sql_patron.first_name,
+        last_name: sql_patron.last_name,
+        gender: sql_patron.gender,
+        date: sql_patron.date_of_birth ? dayjs(sql_patron.date_of_birth) : null,
+        grade_level: sql_patron.grade_level,
+        family_members: sql_patron.family_members,
+        family_status: sql_patron.family_status,
+        family_members_with_income: sql_patron.family_members_with_income,
+        barriers_to_education: sql_patron.barriers_to_education,
+        family_support_level: sql_patron.family_support_level,
+        favorite_subject: sql_patron.favorite_subject,
+        percieved_most_useful_subject: sql_patron.percieved_most_useful_subject,
+        percieved_most_difficult_subject: sql_patron.percieved_most_difficult_subject,
+        library_discovery_method: sql_patron.library_discovery_method,
+        library_travel_time: sql_patron.library_travel_time,
+        desired_library_resource: sql_patron.desired_library_resources,
+        library_attendance_goal: sql_patron.library_attendance_goal,
+      }
+    }
+  })
+  console.log(cleaned_patron_list)
 
-  res.send("You will have troubles until this is an array of patron objects.")
+
+  res.status(200)
+  res.send(JSON.stringify(cleaned_patron_list));
 })
 
 function create_id(library_id: number): string {
