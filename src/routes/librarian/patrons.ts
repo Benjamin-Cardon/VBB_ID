@@ -81,6 +81,7 @@ patrons.get('/list', async (req: Request, res: Response) => {
     ORDER BY
       first_name ASC;`
   const patron_list = await client.query(query_string, [library_id])
+  //console.log(patron_list.rows)
   const cleaned_patron_list = patron_list.rows.map((sql_patron): patron => {
     return {
       patron_id: sql_patron.patron_id,
@@ -92,7 +93,7 @@ patrons.get('/list', async (req: Request, res: Response) => {
         gender: sql_patron.gender,
         date: sql_patron.date_of_birth ? dayjs(sql_patron.date_of_birth) : null,
         grade_level: sql_patron.grade_level,
-        family_members: sql_patron.family_members,
+        family_members: sql_patron.immediate_family_members,
         family_status: sql_patron.family_status,
         family_members_with_income: sql_patron.family_members_with_income,
         barriers_to_education: sql_patron.barriers_to_education,
@@ -108,8 +109,6 @@ patrons.get('/list', async (req: Request, res: Response) => {
     }
   })
   console.log(cleaned_patron_list)
-
-
   res.status(200)
   res.send(JSON.stringify(cleaned_patron_list));
 })

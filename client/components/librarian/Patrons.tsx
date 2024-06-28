@@ -73,13 +73,14 @@ function Patrons(patron_props: props) {
 
   useEffect(() => {
     set_displayed_patrons(filtered_patrons.slice((page - 1) * 10, page * 10 < filtered_patrons.length ? page * 10 : filtered_patrons.length))
+    console.log(filtered_patrons)
   }, [page])
 
 
   let on_search_patrons = function () {
     let patrons = fetched_patrons.filter((patron) => {
-      let name = patron.profile.first_name + " " + patron.profile.last_name;
-      let searched = search_text.trim();
+      let name = (patron.profile.first_name + " " + patron.profile.last_name).trim().toLowerCase();
+      let searched = search_text.trim().toLowerCase();
       return name.includes(searched)
     })
     if (orderby == 'First Name') {
