@@ -171,6 +171,7 @@ function RegisterPatron(register_props: props) {
         >
           <TextField value={form_state.first_name} onChange={change_state_text('first_name')} label="First Name" error={error_state.first_name} />
           <TextField value={form_state.last_name} onChange={change_state_text('last_name')} label="Last Name" error={error_state.last_name} />
+          <Button>Link to Mentorship</Button>
 
           <FormControl error={error_state.gender}>
             <FormLabel>What's your gender?</FormLabel>
