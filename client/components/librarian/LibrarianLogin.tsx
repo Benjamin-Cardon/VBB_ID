@@ -1,10 +1,11 @@
 import { useState, useEffect, FormEventHandler, FormEvent } from 'react';
 import React from 'react';
-import { TextField, InputLabel, MenuItem, FormControl, Select, Button, SelectChangeEvent } from '@mui/material';
+import { TextField, InputLabel, MenuItem, FormControl, Select, Button, SelectChangeEvent, Alert, Snackbar } from '@mui/material';
 import { login_state } from '../../types';
 import { ChangeEvent } from 'react';
 import { props } from '../Librarian';
 import { useAuth } from './AuthContext';
+
 
 type library = {
   name: string,
@@ -21,6 +22,7 @@ function LibrarianLogin(library_props: props) {
   let lib: Array<library> = [];
   const [form_state, set_form_state] = useState(obj)
   const [libraries, set_libraries] = useState(lib);
+  const [open, setOpen] = useState(false);
   useEffect(() => {
     console.log("Used Effect")
     fetch("http://localhost:3000/login/libraries")
@@ -93,11 +95,11 @@ function LibrarianLogin(library_props: props) {
           auth.login(stringified_body);
           library_props.changePage("LibrarianMenu");
         }
-        console.log("change observed")
       }
     })
+
     function handle_incorrect_login() {
-      console.log("That's not a correct password, you buffoon!")
+      setOpen(true)
     }
   }
   return (<div><div>
@@ -116,6 +118,11 @@ function LibrarianLogin(library_props: props) {
     </FormControl>
     <Button onClick={on_submit_login}>Log in</Button>
   </div>
+    <Snackbar open={open}
+      autoHideDuration={6000}
+      onClose={() => setOpen(false)}>
+      <Alert severity='error'>Login Failed</Alert>
+    </Snackbar>
   </div>)
 }
 

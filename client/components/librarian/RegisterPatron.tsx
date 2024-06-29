@@ -8,7 +8,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { options } from "./form_option_objects";
 import { useAuth } from "./AuthContext";
-
+import MentorshipConnectModal from "./MentorshipConnectModal";
 function RegisterPatron(register_props: props) {
   const session_id = useAuth().session_id;
   const init_values: register_state = {
@@ -55,6 +55,7 @@ function RegisterPatron(register_props: props) {
   const [portal_form, set_portal_form] = useState({});
   const [error_state, set_error_state] = useState(init_errors);
   const [open, setOpen] = useState(false);
+  const [mentorshipOpen, setMentorshipOpen] = useState(false);
   const [code, setCode] = useState("");
   void function get_portal() {
 
@@ -129,6 +130,10 @@ function RegisterPatron(register_props: props) {
       set_form_state(obj)
     };
   }
+  function close_modal() {
+    setMentorshipOpen(false);
+    console.log("Modal Closed")
+  }
 
   function change_state_select(state: string) {
     return (e: SelectChangeEvent) => {
@@ -171,7 +176,8 @@ function RegisterPatron(register_props: props) {
         >
           <TextField value={form_state.first_name} onChange={change_state_text('first_name')} label="First Name" error={error_state.first_name} />
           <TextField value={form_state.last_name} onChange={change_state_text('last_name')} label="Last Name" error={error_state.last_name} />
-          <Button>Link to Mentorship</Button>
+          <Button onClick={() => { setMentorshipOpen(true) }}>Link to Mentorship</Button>
+          <MentorshipConnectModal open_state={mentorshipOpen} close={close_modal} />
 
           <FormControl error={error_state.gender}>
             <FormLabel>What's your gender?</FormLabel>
