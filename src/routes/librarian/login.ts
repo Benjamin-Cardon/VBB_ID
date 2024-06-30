@@ -6,7 +6,7 @@ import client from "../../db/client";
 login.post('/attempt', async (req: Request, res: Response) => {
   const { password, username, library } = req.body;
   console.log(username, password, library);
-  const result = await client.query('SELECT * FROM librarians WHERE username = $1 AND password = $2', [username, password]);
+  const result = await client.query('SELECT * FROM librarians JOIN libraries ON librarians.library_id = libraries.id WHERE librarians.username = $1 AND librarians.password = $2 AND libraries.name = $3', [username, password, library]);
   const user = result.rows[0];
   //console.log(user);
 

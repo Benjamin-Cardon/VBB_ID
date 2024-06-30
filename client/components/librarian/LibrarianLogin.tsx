@@ -71,7 +71,6 @@ function LibrarianLogin(library_props: props) {
   }
 
   const on_submit_login: FormEventHandler<HTMLButtonElement> = (event: FormEvent<HTMLButtonElement>) => {
-    console.log("Button Pressed")
     console.log(JSON.stringify(form_state))
     fetch("http://localhost:3000/login/attempt", {
       method: "POST",
