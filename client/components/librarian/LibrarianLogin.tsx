@@ -54,10 +54,14 @@ function LibrarianLogin(library_props: props) {
       if (input == "password") {
         if (e.target.value) {
           set_form_state({ ...form_state, password: e.target.value })
+        } else {
+          set_form_state({ ...form_state, password: "" })
         }
       } else if (input == "username") {
         if (e.target.value) {
           set_form_state({ ...form_state, username: e.target.value })
+        } else {
+          set_form_state({ ...form_state, username: "" })
         }
       }
     }
