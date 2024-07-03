@@ -85,13 +85,13 @@ patrons.get('/list', async (req: Request, res: Response) => {
   const cleaned_patron_list = patron_list.rows.map((sql_patron): patron => {
     return {
       patron_id: sql_patron.patron_id,
-      last_login: sql_patron.most_recent_attendance ? dayjs(sql_patron.most_recent_attendance) : null,
+      last_login: sql_patron.most_recent_attendance ? sql_patron.most_recent_attendance : null,
       count_logins: sql_patron.attendance_count,
       profile: {
         first_name: sql_patron.first_name,
         last_name: sql_patron.last_name,
         gender: sql_patron.gender,
-        date: sql_patron.date_of_birth ? dayjs(sql_patron.date_of_birth) : null,
+        date: sql_patron.date_of_birth ? sql_patron.date_of_birth : null,
         grade_level: sql_patron.grade_level,
         family_members: sql_patron.immediate_family_members,
         family_status: sql_patron.family_status,

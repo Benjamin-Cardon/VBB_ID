@@ -42,10 +42,29 @@ export interface register_state {
   desired_library_resource: desired_library_resource | "";
   library_attendance_goal: library_attendance_goal | "";
 }
+
 export type patron = {
   patron_id: string;
-  last_login: Dayjs | null;
+  last_login: string | null;
   count_logins: Number;
-  profile: register_state;
+  profile: {
+    first_name: string;
+    last_name: string;
+    gender: gender | '';
+    date: string | null;
+    grade_level: grade_level | '';
+    family_members: family_members | '';
+    family_status: family_status | "";
+    family_members_with_income: family_members_with_income | "";
+    barriers_to_education: barriers_to_education | "";
+    family_support_level: family_support_level | "";
+    favorite_subject: subjects | "";
+    percieved_most_useful_subject: subjects | "";
+    percieved_most_difficult_subject: subjects | "";
+    library_discovery_method: library_discovery_method | "";
+    library_travel_time: library_travel_time | "";
+    desired_library_resource: desired_library_resource | "";
+    library_attendance_goal: library_attendance_goal | "";
+  };
 }
 

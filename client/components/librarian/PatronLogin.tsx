@@ -45,19 +45,19 @@ function PatronLogin(patron_props: props) {
   };
 
   function incorrect_code() {
-
+    // Go red and a note should pop up "Incorrect login", but the typed in code should not be erased.
   }
 
   function handle_attendance() {
-
+    // it should go green for a moment- some kind of signal of success, and the typed in code should be erased.
   }
 
   function already_logged_in() {
-
+    // it should go yellow, the code should be erased, and the note should pop up "Already logged in"
   }
 
   function something_wrong() {
-
+    // a dialog box should appear and notify the user that something is going wrong with the website- please notify web administrator (potentially benji)
   }
 
   return <div style={{ height: "90vh" }}>

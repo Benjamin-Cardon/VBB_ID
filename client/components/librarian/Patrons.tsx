@@ -5,6 +5,8 @@ import { Button, Box, Container, TextField, Typography, Pagination, FormControl,
 import Patron from "./Patron";
 import { patron } from "../../types";
 import { useAuth } from "./AuthContext";
+import { ImageNotSupportedSharp } from "@mui/icons-material";
+import dayjs from "dayjs";
 const patron_dummy: patron = {
   patron_id: "Yahoo",
   last_login: null,
@@ -83,6 +85,7 @@ function Patrons(patron_props: props) {
       let searched = search_text.trim().toLowerCase();
       return name.includes(searched)
     })
+
     if (orderby == 'First Name') {
       patrons.sort((a: patron, b: patron) => {
         return a.profile.first_name.localeCompare(b.profile.first_name);
@@ -93,7 +96,7 @@ function Patrons(patron_props: props) {
       })
     } else if (orderby == 'Count Attendance') {
       patrons.sort((a: patron, b: patron) => {
-        return Number(a.count_logins) - Number(b.count_logins)
+        return Number(b.count_logins) - Number(a.count_logins)
       })
     } else if (orderby == 'Time Last Attended (Recent)') {
       patrons.sort((a: patron, b: patron) => {
@@ -107,16 +110,10 @@ function Patrons(patron_props: props) {
         if (!b.last_login) {
           return 1;
         }
-        if (a.last_login.isBefore(b.last_login)) {
-          return 1;
-        } else if (b.last_login.isBefore(a.last_login)) {
-          return -1;
-        } else {
-          return 0;
-        }
+        console.log(Date.parse(b.last_login.slice(0, 10)) - Date.parse(a.last_login.slice(0, 10)));
+        return Date.parse(b.last_login.slice(0, 10)) - Date.parse(a.last_login.slice(0, 10));
       })
     } else if (orderby == 'Time Last Attended (Far)') {
-      //TODO Fix
       patrons.sort((a: patron, b: patron) => {
         if (!a.last_login && !b.last_login) {
           return 0;
@@ -127,15 +124,10 @@ function Patrons(patron_props: props) {
         if (!b.last_login) {
           return -1;
         }
-        if (a.last_login.isBefore(b.last_login)) {
-          return -1;
-        } else if (b.last_login.isBefore(a.last_login)) {
-          return 1;
-        } else {
-          return 0;
-        }
+        return Date.parse(a.last_login.slice(0, 10)) - Date.parse(b.last_login.slice(0, 10));
       })
     }
+
     set_filtered_patrons(patrons);
     setPage(1);
     set_displayed_patrons(patrons.slice((page - 1) * 10, page * 10 < patrons.length ? page * 10 : patrons.length))
