@@ -1,6 +1,8 @@
 import { useState, useEffect, FormEventHandler, FormEvent } from 'react';
 import React from 'react';
-import { TextField, InputLabel, MenuItem, FormControl, Select, Button, SelectChangeEvent, Alert, Snackbar } from '@mui/material';
+import { TextField, InputLabel, MenuItem, FormControl, Select, Button, SelectChangeEvent, Alert, Snackbar, Input, InputAdornment, IconButton, } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { login_state } from '../../types';
 import { ChangeEvent } from 'react';
 import { props } from '../Librarian';
@@ -23,6 +25,8 @@ function LibrarianLogin(library_props: props) {
   const [form_state, set_form_state] = useState(obj)
   const [libraries, set_libraries] = useState(lib);
   const [open, setOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   useEffect(() => {
     console.log("Used Effect")
     fetch("http://localhost:3000/login/libraries")
@@ -70,6 +74,12 @@ function LibrarianLogin(library_props: props) {
     set_form_state({ ...form_state, library: e.target.value })
   }
 
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
+
   const on_submit_login: FormEventHandler<HTMLButtonElement> = (event: FormEvent<HTMLButtonElement>) => {
     console.log(JSON.stringify(form_state))
     fetch("http://localhost:3000/login/attempt", {
@@ -106,8 +116,28 @@ function LibrarianLogin(library_props: props) {
     }
   }
   return (<div><div>
-    <TextField variant='outlined' value={form_state.username} onChange={on_form_change('username')}>Username</TextField>
-    <TextField variant='outlined' value={form_state.password} onChange={on_form_change('password')}>Password</TextField>
+    <TextField variant="outlined" value={form_state.username} onChange={on_form_change('username')}>Username</TextField>
+    <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+      <InputLabel htmlFor="standard-adornment-password">Password</InputLabel>
+      <Input
+        id="standard-adornment-password"
+        type={showPassword ? 'text' : 'password'}
+        value={form_state.password}
+        onChange={on_form_change('password')}
+        endAdornment={
+          <InputAdornment position="end">
+            <IconButton
+              aria-label="toggle password visibility"
+              onClick={handleClickShowPassword}
+              onMouseDown={handleMouseDownPassword}
+            >
+              {showPassword ? <VisibilityOff /> : <Visibility />}
+            </IconButton>
+          </InputAdornment>
+        }
+      />
+    </FormControl>
+
     <FormControl>
       <InputLabel id='select-library-label'>Library</InputLabel>
       <Select
