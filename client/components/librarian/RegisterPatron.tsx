@@ -100,6 +100,13 @@ function RegisterPatron(register_props: props) {
 
   const handleClose = () => {
     setOpen(false);
+    set_form_state(init_values);
+    set_error_state(init_errors);
+    setCode("");
+    setStudent("");
+    set_barriers_to_education(init_barriers);
+    set_goals(init_goals);
+    set_desired_libarary_resources(init_desired_resources);
   };
 
   function register() {
@@ -107,6 +114,9 @@ function RegisterPatron(register_props: props) {
     let has_errors = false;
     Object.keys(form_state).forEach((key) => {
       if (key == "library_attendance_goal" || key == "barriers_to_education" || key == "desired_library_resource") {
+        return;
+      }
+      if (!(student == "Student") && (key == "grade_level" || key == "favorite_subject" || key == "percieved_most_useful_subject" || key == "percieved_most_difficult_subject")) {
         return;
       }
       //@ts-ignore
@@ -233,8 +243,11 @@ function RegisterPatron(register_props: props) {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
+            <Button onClick={(e) => { register_props.changePage('PatronLogin') }} autoFocus>
+              Log in
+            </Button>
             <Button onClick={handleClose} autoFocus>
-              O.K.
+              Register Another Patron
             </Button>
           </DialogActions>
         </Dialog>

@@ -17,7 +17,7 @@ patrons.post('/register', async (req: Request, res: Response) => {
     console.log(register_form);
     console.log(librarian)
     console.log(library);
-    let id = create_id(library.id_count);
+    let id = create_id(library.id_count, register_form.student == "Student");
     console.log(register_form.desired_library_resources)
     const add_person = await client.query("INSERT INTO patrons(patron_id, library_id, first_name, last_name, gender, date_of_birth, grade_level, immediate_family_members, family_status, family_members_with_income, barriers_to_education, family_support_level, favorite_subject, percieved_most_useful_subject, percieved_most_difficult_subject, library_discovery_method,library_travel_time, desired_library_resources, library_attendance_goal, is_student ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)", [
       id, library.id, register_form.first_name, register_form.last_name, register_form.gender, register_form.date, register_form.grade_level, register_form.family_members, register_form.family_status, register_form.family_members_with_income, register_form.barriers_to_education, register_form.family_support_level, register_form.favorite_subject, register_form.percieved_most_useful_subject, register_form.percieved_most_difficult_subject, register_form.library_discovery_method, register_form.library_travel_time, register_form.desired_library_resources, register_form.goals, register_form.student == "Student"
@@ -113,9 +113,9 @@ patrons.get('/list', async (req: Request, res: Response) => {
   res.send(JSON.stringify(cleaned_patron_list));
 })
 
-function create_id(library_id: number): string {
+function create_id(library_id: number, is_student: boolean): string {
   let id = "";
-  id = "ST" + id;
+  id = is_student ? "ST" + id : "NS" + id;
   let year = new Date().getFullYear().toString().substr(-2)
   id = id + year + '-';
   let id_integer = library_id.toString();
