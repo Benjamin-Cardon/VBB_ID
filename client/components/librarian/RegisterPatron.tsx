@@ -31,6 +31,7 @@ function RegisterPatron(register_props: props) {
     library_attendance_goal: ''
   }
   let init_errors = {
+    student: false,
     first_name: false,
     last_name: false,
     gender: false,
@@ -51,16 +52,10 @@ function RegisterPatron(register_props: props) {
   }
 
   const [form_state, set_form_state] = useState(init_values);
-  const [has_portal, set_has_portal] = useState(false);
-  const [portal_form, set_portal_form] = useState({});
   const [error_state, set_error_state] = useState(init_errors);
   const [open, setOpen] = useState(false);
-  const [mentorshipOpen, setMentorshipOpen] = useState(false);
   const [code, setCode] = useState("");
-  void function get_portal() {
-
-
-  }
+  const [student, setStudent] = useState("");
 
   const handleClickOpen = (devCode: string) => {
     setOpen(true);
@@ -130,10 +125,6 @@ function RegisterPatron(register_props: props) {
       set_form_state(obj)
     };
   }
-  function close_modal() {
-    setMentorshipOpen(false);
-    console.log("Modal Closed")
-  }
 
   function change_state_select(state: string) {
     return (e: SelectChangeEvent) => {
@@ -169,6 +160,7 @@ function RegisterPatron(register_props: props) {
             </Button>
           </DialogActions>
         </Dialog>
+
         <Stack
           direction="column"
           divider={<Divider orientation="horizontal" flexItem />}
@@ -176,8 +168,6 @@ function RegisterPatron(register_props: props) {
         >
           <TextField value={form_state.first_name} onChange={change_state_text('first_name')} label="First Name" error={error_state.first_name} />
           <TextField value={form_state.last_name} onChange={change_state_text('last_name')} label="Last Name" error={error_state.last_name} />
-          <Button onClick={() => { setMentorshipOpen(true) }}>Link to Mentorship</Button>
-          <MentorshipConnectModal open_state={mentorshipOpen} close={close_modal} />
 
           <FormControl error={error_state.gender}>
             <FormLabel>What's your gender?</FormLabel>
@@ -193,126 +183,145 @@ function RegisterPatron(register_props: props) {
             <DatePicker value={form_state.date} onChange={(e) => set_form_state({ ...form_state, date: e })} />
           </LocalizationProvider>
 
-          <FormControl error={error_state.grade_level}>
-            <FormLabel> What grade are you in?</FormLabel>
-            <Select
-              value={form_state.grade_level}
-              onChange={change_state_select('grade_level')}>
-              {options.grade_levels.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
-            </Select>
-          </FormControl>
-
-          <FormControl error={error_state.family_members}>
-            <FormLabel>Including yourself, how many family members do you have living in your home? </FormLabel>
-            <Select
-              value={form_state.family_members}
-              onChange={change_state_select('family_members')}>
-              {options.family_members.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
-            </Select>
-          </FormControl>
-
-          <FormControl error={error_state.family_status}>
-            <FormLabel>What is your current family status?</FormLabel>
+          <FormControl error={error_state.student}>
+            <FormLabel>Are you currently a student? ie: seeking a formal education, or under the age of 18?</FormLabel>
             <RadioGroup
-              value={form_state.family_status}
-              onChange={change_state_text("family_status")}>
-              {options.family_statuses.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+              value={student}
+              onChange={(e) => setStudent(e.target.value)}>
+              <FormControlLabel value="Student" control={<Radio />} label="Student" />
+              <FormControlLabel value="Non-Student" control={<Radio />} label="Non-Student" />
             </RadioGroup>
           </FormControl>
 
-          <FormControl error={error_state.family_members_with_income}>
-            <FormLabel>How many members of your family have jobs that provide income?</FormLabel>
-            <RadioGroup
-              value={form_state.family_members_with_income}
-              onChange={change_state_text("family_members_with_income")}>
-              {options.family_members_with_income.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
-            </RadioGroup>
-          </FormControl>
+          {student == "Student" && <div>
+            <FormControl error={error_state.grade_level}>
+              <FormLabel> What grade are you in?</FormLabel>
+              <Select
+                value={form_state.grade_level}
+                onChange={change_state_select('grade_level')}>
+                {options.grade_levels.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
+              </Select>
+            </FormControl>
 
-          <FormControl error={error_state.barriers_to_education}>
-            <FormLabel>What are the main obstacles or challenges that have prevented you from continuing or completing your education?</FormLabel>
-            <RadioGroup
-              value={form_state.barriers_to_education}
-              onChange={change_state_text("barriers_to_education")}>
-              {options.barriers_to_education.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
-            </RadioGroup>
-          </FormControl>
+            <FormControl error={error_state.barriers_to_education}>
+              <FormLabel>What are the main obstacles or challenges that have prevented you from continuing or completing your education?</FormLabel>
+              <RadioGroup
+                value={form_state.barriers_to_education}
+                onChange={change_state_text("barriers_to_education")}>
+                {options.barriers_to_education.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+              </RadioGroup>
+            </FormControl>
 
-          <FormControl error={error_state.family_support_level}>
-            <FormLabel>How would you rate the level of support you receive from your family?</FormLabel>
-            <RadioGroup
-              value={form_state.family_support_level}
-              onChange={change_state_text("family_support_level")}>
-              {options.family_support_level.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
-            </RadioGroup>
-          </FormControl>
+            <FormControl error={error_state.favorite_subject}>
+              <FormLabel>Which subject do you enjoy the most in school?</FormLabel>
+              <Select
+                value={form_state.favorite_subject}
+                onChange={change_state_select('favorite_subject')}>
+                {options.subjects.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
+              </Select>
+            </FormControl>
 
-          <FormControl error={error_state.favorite_subject}>
-            <FormLabel>Which subject do you enjoy the most in school?</FormLabel>
-            <Select
-              value={form_state.favorite_subject}
-              onChange={change_state_select('favorite_subject')}>
-              {options.subjects.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
-            </Select>
-          </FormControl>
+            <FormControl error={error_state.percieved_most_useful_subject}>
+              <FormLabel>What subject do you believe will be most useful for your future career?</FormLabel>
+              <Select
+                value={form_state.percieved_most_useful_subject}
+                onChange={change_state_select('percieved_most_useful_subject')}>
+                {options.subjects.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
+              </Select>
+            </FormControl>
 
-          <FormControl error={error_state.percieved_most_useful_subject}>
-            <FormLabel>What subject do you believe will be most useful for your future career?</FormLabel>
-            <Select
-              value={form_state.percieved_most_useful_subject}
-              onChange={change_state_select('percieved_most_useful_subject')}>
-              {options.subjects.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
-            </Select>
-          </FormControl>
+            <FormControl error={error_state.percieved_most_difficult_subject}>
+              <FormLabel>What subject do you find most difficult in school and need help with?</FormLabel>
+              <Select
+                value={form_state.percieved_most_difficult_subject}
+                onChange={change_state_select('percieved_most_difficult_subject')}>
+                {options.subjects.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
+              </Select>
+            </FormControl>
+          </div>
+          }
+          {student != '' && <div>
+            <FormControl error={error_state.family_members}>
+              <FormLabel>Including yourself, how many family members do you have living in your home? </FormLabel>
+              <Select
+                value={form_state.family_members}
+                onChange={change_state_select('family_members')}>
+                {options.family_members.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
+              </Select>
+            </FormControl>
 
-          <FormControl error={error_state.percieved_most_difficult_subject}>
-            <FormLabel>What subject do you find most difficult in school and need help with?</FormLabel>
-            <Select
-              value={form_state.percieved_most_difficult_subject}
-              onChange={change_state_select('percieved_most_difficult_subject')}>
-              {options.subjects.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
-            </Select>
-          </FormControl>
+            <FormControl error={error_state.family_status}>
+              <FormLabel>What is your current family status?</FormLabel>
+              <RadioGroup
+                value={form_state.family_status}
+                onChange={change_state_text("family_status")}>
+                {options.family_statuses.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+              </RadioGroup>
+            </FormControl>
 
-          <FormControl error={error_state.library_discovery_method}>
-            <FormLabel>How did you hear about our library?</FormLabel>
-            <RadioGroup
-              value={form_state.library_discovery_method}
-              onChange={change_state_text("library_discovery_method")}>
-              {options.library_discovery_method.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
-            </RadioGroup>
-          </FormControl>
+            <FormControl error={error_state.family_members_with_income}>
+              <FormLabel>How many members of your family have jobs that provide income?</FormLabel>
+              <RadioGroup
+                value={form_state.family_members_with_income}
+                onChange={change_state_text("family_members_with_income")}>
+                {options.family_members_with_income.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+              </RadioGroup>
+            </FormControl>
 
-          <FormControl error={error_state.library_travel_time}>
-            <FormLabel> How long does it take you to travel to the library?</FormLabel>
-            <RadioGroup
-              value={form_state.library_travel_time}
-              onChange={change_state_text("library_travel_time")}>
-              {options.library_travel_time.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
-            </RadioGroup>
-          </FormControl>
 
-          <FormControl error={error_state.desired_library_resource}>
-            <FormLabel>What additional resources or services would you like to see in the library? multiple choices</FormLabel>
-            <RadioGroup
-              value={form_state.desired_library_resource}
-              onChange={change_state_text("desired_library_resource")}>
-              {options.desired_library_resource.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
-            </RadioGroup>
-          </FormControl>
 
-          <FormControl error={error_state.library_attendance_goal}>
-            <FormLabel> What do you expect to achieve from using our library? multiple choices</FormLabel>
-            <RadioGroup
-              value={form_state.library_attendance_goal}
-              onChange={change_state_text("library_attendance_goal")}>
-              {options.library_attendance_goal.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
-            </RadioGroup>
-          </FormControl>
+            <FormControl error={error_state.family_support_level}>
+              <FormLabel>How would you rate the level of support you receive from your family?</FormLabel>
+              <RadioGroup
+                value={form_state.family_support_level}
+                onChange={change_state_text("family_support_level")}>
+                {options.family_support_level.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+              </RadioGroup>
+            </FormControl>
+
+
+            <FormControl error={error_state.library_discovery_method}>
+              <FormLabel>How did you hear about our library?</FormLabel>
+              <RadioGroup
+                value={form_state.library_discovery_method}
+                onChange={change_state_text("library_discovery_method")}>
+                {options.library_discovery_method.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+              </RadioGroup>
+            </FormControl>
+
+            <FormControl error={error_state.library_travel_time}>
+              <FormLabel> How long does it take you to travel to the library?</FormLabel>
+              <RadioGroup
+                value={form_state.library_travel_time}
+                onChange={change_state_text("library_travel_time")}>
+                {options.library_travel_time.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+              </RadioGroup>
+            </FormControl>
+
+            <FormControl error={error_state.desired_library_resource}>
+              <FormLabel>What additional resources or services would you like to see in the library? multiple choices</FormLabel>
+              <RadioGroup
+                value={form_state.desired_library_resource}
+                onChange={change_state_text("desired_library_resource")}>
+                {options.desired_library_resource.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+              </RadioGroup>
+            </FormControl>
+
+            <FormControl error={error_state.library_attendance_goal}>
+              <FormLabel> What do you expect to achieve from using our library? multiple choices</FormLabel>
+              <RadioGroup
+                value={form_state.library_attendance_goal}
+                onChange={change_state_text("library_attendance_goal")}>
+                {options.library_attendance_goal.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+              </RadioGroup>
+            </FormControl>
+          </div>}
+
         </Stack>
-        <Box mt='2'>
+        {student != '' && <Box mt='2'>
           <Button onClick={register}> Submit</Button>
-        </Box>
+        </Box>}
+
       </Box>
 
 
