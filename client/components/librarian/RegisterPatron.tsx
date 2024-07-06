@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from "react";
 import { useState } from "react";
-import { TextField, FormControl, RadioGroup, Radio, FormLabel, FormControlLabel, Select, Button, MenuItem, SelectChangeEvent, Stack, Divider, Container, Box, Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText } from "@mui/material";
+import { TextField, FormControl, RadioGroup, Radio, FormLabel, FormControlLabel, Select, Checkbox, FormGroup, Button, MenuItem, SelectChangeEvent, Stack, Divider, Container, Box, Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText } from "@mui/material";
 import { props } from "../Librarian";
 import { family_members, register_state, family_status, family_members_with_income } from "../../types";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -9,6 +9,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { options } from "./form_option_objects";
 import { useAuth } from "./AuthContext";
 import MentorshipConnectModal from "./MentorshipConnectModal";
+
 function RegisterPatron(register_props: props) {
   const session_id = useAuth().session_id;
   const init_values: register_state = {
@@ -20,16 +21,17 @@ function RegisterPatron(register_props: props) {
     family_members: '',
     family_status: "",
     family_members_with_income: '',
-    barriers_to_education: '',
     family_support_level: '',
     favorite_subject: '',
     percieved_most_difficult_subject: '',
     percieved_most_useful_subject: '',
     library_discovery_method: '',
     library_travel_time: '',
-    desired_library_resource: '',
-    library_attendance_goal: ''
+    desired_library_resource: "",
+    barriers_to_education: "",
+    library_attendance_goal: ""
   }
+
   let init_errors = {
     student: false,
     first_name: false,
@@ -50,12 +52,46 @@ function RegisterPatron(register_props: props) {
     desired_library_resource: false,
     library_attendance_goal: false,
   }
+  let init_barriers = {
+    "Family Responsibilities: Need to work or take care of siblings": false,
+    "Family and Cultural Barriers: Lack of family support, cultural barriers to education": false,
+    "Financial Constraints: Lack of money to buy food or pay school fees, not enough money for education": false,
+    "Distance from School: No nearby schools": false,
+    "Lack of School Materials: Books, uniforms, schools without proper resources": false,
+    "Safety concerns: on the way to school or in school": false,
+    "Health and Nutrition Issues: Lack of proper nutrition causing health issues, poor health or disabilities": false,
+    "Lack of Technology Access: Internet, computers for homework or study": false,
+    "Early Life Changes: Early marriage, pregnancy": false,
+    "Insufficient Educational Infrastructure: Insufficient teachers, overcrowded classes, limited opportunities for higher education": false,
+    "Political Instability": false
+  }
+  let init_goals = {
+    "Improve my performance in one or more school subjects": false,
+    "Enhance my language skills": false,
+    "Access computers and the internet": false,
+    "Read or borrow books": false,
+    "Utilize a quiet space for studying": false,
+    "Participate in the mentor program": false
+  }
+  let init_desired_resources = {
+    "More Books and E-books": false,
+    "Study and Meeting Spaces": false,
+    "Computers and Internet Access": false,
+    "Workshops and Educational Programs": false,
+    "Educational activities": false,
+    "Multimedia Resources: Access to audio - books, movies, music, and other digital media.": false,
+    "Career and Job Assistance": false,
+    "Art supplies": false
+  }
 
   const [form_state, set_form_state] = useState(init_values);
   const [error_state, set_error_state] = useState(init_errors);
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState("");
   const [student, setStudent] = useState("");
+  const [barriers_to_education, set_barriers_to_education] = useState(init_barriers)
+  const [goals, set_goals] = useState(init_goals)
+  const [desired_library_resources, set_desired_libarary_resources] = useState(init_desired_resources);
 
   const handleClickOpen = (devCode: string) => {
     setOpen(true);
@@ -70,6 +106,9 @@ function RegisterPatron(register_props: props) {
     let new_errors = { ...error_state }
     let has_errors = false;
     Object.keys(form_state).forEach((key) => {
+      if (key == "library_attendance_goal" || key == "barriers_to_education" || key == "desired_library_resource") {
+        return;
+      }
       //@ts-ignore
       if (form_state[key] == '') {
 
@@ -88,13 +127,31 @@ function RegisterPatron(register_props: props) {
       console.log(new_errors)
       set_error_state(new_errors);
     } else {
-      console.log("Doing A fetch")
+      let barriers_to_education_arr: string[] = [];
+      let goals_arr: string[] = [];
+      let desired_library_resources_arr: string[] = [];
+      for (const [key, value] of Object.entries(barriers_to_education)) {
+        if (value) {
+          barriers_to_education_arr.push(key);
+        }
+      }
+      for (const [key, value] of Object.entries(goals)) {
+        if (value) {
+          goals_arr.push(key);
+        }
+      }
+      for (const [key, value] of Object.entries(desired_library_resources)) {
+        if (value) {
+          desired_library_resources_arr.push(key);
+        }
+      }
+      let body_obj = { ...form_state, desired_library_resources: desired_library_resources_arr, goals: goals_arr, barriers_to_education: barriers_to_education_arr, student: student };
       fetch("http://localhost:3000/patrons/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ register_form: form_state, session_id })
+        body: JSON.stringify({ register_form: body_obj, session_id })
       }).then(async (res) => {
         let stringified_body: string = '';
         if (res.body != null) {
@@ -135,6 +192,28 @@ function RegisterPatron(register_props: props) {
     };
   }
 
+  const change_state_check = (state: string) => {
+    if (state == "goals") {
+      return (event: React.ChangeEvent<HTMLInputElement>) => {
+        set_goals({
+          ...goals, [event.target.name]: event.target.checked
+        })
+      }
+    } else if (state == "desired resources") {
+      return (event: React.ChangeEvent<HTMLInputElement>) => {
+        set_desired_libarary_resources(
+          { ...desired_library_resources, [event.target.name]: event.target.checked, }
+        )
+      }
+    } else if (state == "barriers to education")
+      return (event: React.ChangeEvent<HTMLInputElement>) => {
+        set_barriers_to_education({
+          ...barriers_to_education,
+          [event.target.name]: event.target.checked,
+        });
+      }
+  };
+
 
   return (<div>
     <Button onClick={(e) => { register_props.changePage('LibrarianMenu') }}>Main Menu</Button>
@@ -154,9 +233,8 @@ function RegisterPatron(register_props: props) {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Disagree</Button>
             <Button onClick={handleClose} autoFocus>
-              Agree
+              O.K.
             </Button>
           </DialogActions>
         </Dialog>
@@ -205,11 +283,9 @@ function RegisterPatron(register_props: props) {
 
             <FormControl error={error_state.barriers_to_education}>
               <FormLabel>What are the main obstacles or challenges that have prevented you from continuing or completing your education?</FormLabel>
-              <RadioGroup
-                value={form_state.barriers_to_education}
-                onChange={change_state_text("barriers_to_education")}>
-                {options.barriers_to_education.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
-              </RadioGroup>
+              <FormGroup>
+                {options.barriers_to_education.map((option) => <FormControlLabel control={<Checkbox checked={barriers_to_education[option]} onChange={change_state_check("barriers to education")} name={option} />} label={option} />)}
+              </FormGroup>
             </FormControl>
 
             <FormControl error={error_state.favorite_subject}>
@@ -268,8 +344,6 @@ function RegisterPatron(register_props: props) {
               </RadioGroup>
             </FormControl>
 
-
-
             <FormControl error={error_state.family_support_level}>
               <FormLabel>How would you rate the level of support you receive from your family?</FormLabel>
               <RadioGroup
@@ -278,7 +352,6 @@ function RegisterPatron(register_props: props) {
                 {options.family_support_level.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
               </RadioGroup>
             </FormControl>
-
 
             <FormControl error={error_state.library_discovery_method}>
               <FormLabel>How did you hear about our library?</FormLabel>
@@ -300,20 +373,16 @@ function RegisterPatron(register_props: props) {
 
             <FormControl error={error_state.desired_library_resource}>
               <FormLabel>What additional resources or services would you like to see in the library? multiple choices</FormLabel>
-              <RadioGroup
-                value={form_state.desired_library_resource}
-                onChange={change_state_text("desired_library_resource")}>
-                {options.desired_library_resource.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
-              </RadioGroup>
+              <FormGroup>
+                {options.desired_library_resource.map((option) => <FormControlLabel control={<Checkbox checked={desired_library_resources[option]} onChange={change_state_check("desired resources")} name={option} />} label={option} />)}
+              </FormGroup>
             </FormControl>
 
             <FormControl error={error_state.library_attendance_goal}>
               <FormLabel> What do you expect to achieve from using our library? multiple choices</FormLabel>
-              <RadioGroup
-                value={form_state.library_attendance_goal}
-                onChange={change_state_text("library_attendance_goal")}>
-                {options.library_attendance_goal.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
-              </RadioGroup>
+              <FormGroup>
+                {options.library_attendance_goal.map((option) => <FormControlLabel control={<Checkbox checked={goals[option]} onChange={change_state_check("goals")} name={option} />} label={option} />)}
+              </FormGroup>
             </FormControl>
           </div>}
 
