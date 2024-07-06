@@ -4,27 +4,29 @@ CREATE TABLE IF NOT EXISTS public.patrons
     library_id bigint NOT NULL,
     first_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     last_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    gender character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    is_student boolean NOT NULL,
+    mentorship_user_id bigint,
+    gender character varying(255) COLLATE pg_catalog."default",
     date_of_birth date,
-    grade_level integer,
-    immediate_family_members integer,
-    family_status character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    family_members_with_income integer,
-    barriers_to_education character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    grade_level character varying(255) COLLATE pg_catalog."default",
+    immediate_family_members character varying(255) COLLATE pg_catalog."default",
+    family_status character varying(255) COLLATE pg_catalog."default",
+    family_members_with_income character varying(255) COLLATE pg_catalog."default",
+    barriers_to_education TEXT[],
     family_support_level integer,
-    favorite_subject character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    percieved_most_useful_subject character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    percieved_most_difficult_subject character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    library_discovery_method character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    library_travel_time character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    desired_library_resources character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    library_attendance_goal character varying(255) COLLATE pg_catalog."default" NOT NULL
+    favorite_subject character varying(255) COLLATE pg_catalog."default",
+    percieved_most_useful_subject character varying(255) COLLATE pg_catalog."default",
+    percieved_most_difficult_subject character varying(255) COLLATE pg_catalog."default",
+    library_discovery_method character varying(255) COLLATE pg_catalog."default",
+    library_travel_time character varying(255) COLLATE pg_catalog."default",
+    desired_library_resources TEXT[],
+    library_attendance_goal TEXT[]
 );
 
 CREATE TABLE IF NOT EXISTS public.librarians
 (
     id bigserial NOT NULL,
-    platform_user_id bigint,
+    mentorship_user_id bigint,
     library_id bigint NOT NULL,
     password character varying(255) COLLATE pg_catalog."default",
     username character varying(255) COLLATE pg_catalog."default",
@@ -46,6 +48,7 @@ CREATE TABLE IF NOT EXISTS public.libraries
 (
     id bigserial NOT NULL,
     name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    mentorship_library_id bigint,
     address_1 character varying(255) COLLATE pg_catalog."default",
     address_2 character varying(255) COLLATE pg_catalog."default",
     city character varying(255) COLLATE pg_catalog."default",
@@ -56,28 +59,13 @@ CREATE TABLE IF NOT EXISTS public.libraries
     state_province character varying(255) COLLATE pg_catalog."default"
 );
 
+Create TABLE IF NOT EXISTS public.librarian_logins(
+	id bigserial NOT NULL,
+	session_id character varying(255) COLLATE pg_catalog."default" UNIQUE NOT NULL
+);
+
 ALTER TABLE librarians
 ADD CONSTRAINT pk_librarians_id PRIMARY KEY (id);
-
-ALTER TABLE librarians
-ADD CONSTRAINT fk_librarians_belong_to_libraries FOREIGN KEY (library_id) REFERENCES libraries(id)
-
-ALTER TABLE patrons
-ADD CONSTRAINT fk_patrons_belong_to_libraries FOREIGN KEY (library_id) REFERENCES libraries(id)
-
-
-ALTER TABLE attendance_log
-ADD CONSTRAINT fk_attendance_done_by_patron FOREIGN KEY (patron_id) REFERENCES patrons(patron_id)
-
-ALTER TABLE attendance_log
-ADD CONSTRAINT fk_attendance_at_library FOREIGN KEY (library_id) REFERENCES libraries(id)
-
-ALTER TABLE librarian_logins
-ADD COLUMN librarian_id BIGINT, -- Change the data type according to your requirements
-ADD CONSTRAINT fk_librarian_id FOREIGN KEY (librarian_id) REFERENCES librarians(id);
-
-ALTER TABLE attendance_log
-ALTER COLUMN time_attended SET DEFAULT CURRENT_TIMESTAMP;
 
 ALTER TABLE librarian_logins
 ADD PRIMARY KEY (session_id);
@@ -87,6 +75,30 @@ ADD PRIMARY KEY (id);
 
 ALTER TABLE libraries
 ADD PRIMARY KEY (id);
+
+ALTER TABLE librarians
+ADD CONSTRAINT fk_librarians_belong_to_libraries FOREIGN KEY (library_id) REFERENCES libraries(id);
+
+ALTER TABLE patrons
+ADD CONSTRAINT fk_patrons_belong_to_libraries FOREIGN KEY (library_id) REFERENCES libraries(id);
+
+
+ALTER TABLE attendance_log
+ADD CONSTRAINT fk_attendance_done_by_patron FOREIGN KEY (patron_id) REFERENCES patrons(patron_id);
+
+ALTER TABLE attendance_log
+ADD CONSTRAINT fk_attendance_at_library FOREIGN KEY (library_id) REFERENCES libraries(id);
+
+ALTER TABLE librarian_logins
+ADD COLUMN librarian_id BIGINT, -- Change the data type according to your requirements
+ADD CONSTRAINT fk_librarian_id FOREIGN KEY (librarian_id) REFERENCES librarians(id);
+
+ALTER TABLE librarian_logins
+ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE attendance_log
+ALTER COLUMN time_attended SET DEFAULT CURRENT_TIMESTAMP;
+
 
 
 

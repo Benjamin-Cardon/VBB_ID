@@ -20,7 +20,7 @@ type library = {
 }
 function LibrarianLogin(library_props: props) {
   const auth = useAuth();
-  let obj: login_state = { password: 'password123', username: 'librarian1', library: '' };
+  let obj: login_state = { password: 'password123', username: 'johndoe', library: '' };
   let lib: Array<library> = [];
   const [form_state, set_form_state] = useState(obj)
   const [libraries, set_libraries] = useState(lib);
