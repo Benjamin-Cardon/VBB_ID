@@ -67,18 +67,22 @@ function Patron({ patron }: { patron: patron }) {
       }
     } else if (state == 'library_attendance_goal') {
       if (goalSelect != "") {
-        let obj = { ...edited };
-        obj.profile[state].push(goalSelect);
-        setEdited(obj);
-        setGoalSelect('');
+        return () => {
+          let obj = { ...edited };
+          obj.profile[state].push(goalSelect);
+          setEdited(obj);
+          setGoalSelect('');
+        }
       }
 
     } else if (state == 'barriers_to_education') {
       if (barrierSelect != "") {
-        let obj = { ...edited };
-        obj.profile[state].push(barrierSelect);
-        setEdited(obj);
-        setBarrierSelect('');
+        return () => {
+          let obj = { ...edited };
+          obj.profile[state].push(barrierSelect);
+          setEdited(obj);
+          setBarrierSelect('');
+        }
       }
     }
   }
@@ -125,7 +129,8 @@ function Patron({ patron }: { patron: patron }) {
                     <Select
                       value={resourceSelect}
                       // @ts-ignore:
-                      onChange={(e) => { setResourceSelect(e.target.value) }}>
+                      onChange={(e) => { setResourceSelect(e.target.value) }}
+                    >
                       {options.desired_library_resource.map((level) => {
                         if (!edited.profile.desired_library_resource.includes(level)) {
                           return (<MenuItem value={level}>{level}</MenuItem>)
@@ -133,14 +138,15 @@ function Patron({ patron }: { patron: patron }) {
                       })}
                     </Select>
                   </FormControl>
-                  <Button onClick={add_chip("desired_library_resource")} title="Add Desired Resource">Add Desired Resource</Button>
+                  {/* <Button onClick={add_chip("desired_library_resource")} title="Add Desired Resource">Add Desired Resource</Button> */}
                   {edited.profile.desired_library_resource.map((resource) => <Chip label={resource} onDelete={on_delete_chip('desired_library_resource', resource)}></Chip>)}
 
                   <FormControl>
                     <FormLabel>Including yourself, how many family members do you have living in your home? </FormLabel>
                     <Select
                       value={edited.profile.family_members}
-                      onChange={change_state_select('family_members')}>
+                      onChange={change_state_select('family_members')}
+                    >
                       {options.family_members.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
                     </Select>
                   </FormControl>
@@ -274,6 +280,7 @@ function Patron({ patron }: { patron: patron }) {
         <Stack direction='row' alignContent='space-around' justifyContent='space-evenly'>
           <Button>Link to Mentorship</Button>
           <Button onClick={on_edit}>Edit</Button>
+          <Button>Save Changes</Button>
         </Stack>
       </Container>}
     </Paper >
