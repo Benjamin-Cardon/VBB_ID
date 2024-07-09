@@ -1,59 +1,18 @@
 import React from "react";
 import { useState } from "react";
-import { Box, IconButton, Paper, Stack, Typography, Container, Divider, Button, TextField, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
+import { Box, IconButton, Paper, Stack, Typography, Container, Divider, Button, TextField, Radio, RadioGroup, FormControl, SelectChangeEvent, FormLabel, Select, MenuItem, FormGroup, FormControlLabel, Chip } from "@mui/material";
 import { patron } from "../../types";
 import { options } from "./form_option_objects";
-import { KeyboardArrowDown, ThreeP } from "@mui/icons-material";
+import { KeyboardArrowDown, } from "@mui/icons-material";
+import { ChangeEvent } from "react";
 function Patron({ patron }: { patron: patron }) {
-  let init_barriers = {
-    "Family Responsibilities: Need to work or take care of siblings": false,
-    "Family and Cultural Barriers: Lack of family support, cultural barriers to education": false,
-    "Financial Constraints: Lack of money to buy food or pay school fees, not enough money for education": false,
-    "Distance from School: No nearby schools": false,
-    "Lack of School Materials: Books, uniforms, schools without proper resources": false,
-    "Safety concerns: on the way to school or in school": false,
-    "Health and Nutrition Issues: Lack of proper nutrition causing health issues, poor health or disabilities": false,
-    "Lack of Technology Access: Internet, computers for homework or study": false,
-    "Early Life Changes: Early marriage, pregnancy": false,
-    "Insufficient Educational Infrastructure: Insufficient teachers, overcrowded classes, limited opportunities for higher education": false,
-    "Political Instability": false
-  }
-  let init_goals = {
-    "Improve my performance in one or more school subjects": false,
-    "Enhance my language skills": false,
-    "Access computers and the internet": false,
-    "Read or borrow books": false,
-    "Utilize a quiet space for studying": false,
-    "Participate in the mentor program": false
-  }
-  let init_desired_resources = {
-    "More Books and E-books": false,
-    "Study and Meeting Spaces": false,
-    "Computers and Internet Access": false,
-    "Workshops and Educational Programs": false,
-    "Educational activities": false,
-    "Multimedia Resources: Access to audio - books, movies, music, and other digital media.": false,
-    "Career and Job Assistance": false,
-    "Art supplies": false
-  }
-  for (let resource of patron.profile.desired_library_resource) {
-    init_desired_resources[resource] = true;
-  }
-  for (let barrier of patron.profile.barriers_to_education) {
-    init_barriers[barrier] = true;
-  }
-  for (let goal of patron.profile.library_attendance_goal) {
-    init_goals[goal] = true;
-  }
 
   const [expanded, setExpanded] = useState(false);
   const [preferences, setPreferences] = useState(false);
   const [situation, setSituation] = useState(false);
   const [edited, setEdited] = useState(patron);
   const [edit, setEdit] = useState(false);
-  const [barriers_to_education, set_barriers_to_education] = useState(init_barriers)
-  const [goals, set_goals] = useState(init_goals)
-  const [desired_library_resources, set_desired_libarary_resources] = useState(init_desired_resources);
+
 
   const on_expand = () => {
     setExpanded(!expanded);
@@ -63,30 +22,29 @@ function Patron({ patron }: { patron: patron }) {
   const on_edit = () => {
     setEdit(!edit);
   }
-  const change_state_check = (state: string) => {
-    if (state == "goals") {
-      return (event: React.ChangeEvent<HTMLInputElement>) => {
-        set_goals({
-          ...goals, [event.target.name]: event.target.checked
-        })
-      }
-    } else if (state == "desired resources") {
-      return (event: React.ChangeEvent<HTMLInputElement>) => {
-        set_desired_libarary_resources(
-          { ...desired_library_resources, [event.target.name]: event.target.checked, }
-        )
-      }
-    } else if (state == "barriers to education")
-      return (event: React.ChangeEvent<HTMLInputElement>) => {
-        set_barriers_to_education({
-          ...barriers_to_education,
-          [event.target.name]: event.target.checked,
-        });
-      }
-  };
 
   const on_preferences = () => setPreferences(!preferences)
   const on_situation = () => setSituation(!situation)
+  const on_delete_chip = (state: string) => {
+
+  }
+  function change_state_select(state: string) {
+    return (e: SelectChangeEvent) => {
+      let obj = { ...edited };
+      //@ts-ignore
+      obj.profile[state] = e.target.value;
+      setEdited(obj)
+    };
+  }
+
+  function change_state_text(state: string) {
+    return (e: ChangeEvent<HTMLInputElement>) => {
+      let obj = { ...edited };
+      //@ts-ignore
+      obj.profile[state] = e.target.value;
+      setEdited(obj)
+    };
+  }
 
   return (
     <Paper>
@@ -125,19 +83,46 @@ function Patron({ patron }: { patron: patron }) {
                   <Typography>Most useful subject: {patron.profile.percieved_most_useful_subject}</Typography>
                   <Typography>Most difficult subject: {patron.profile.percieved_most_difficult_subject}</Typography></>}
                 {edit && <>
+                  {edited.profile.desired_library_resource.map((resource) => <Chip label={resource} onDelete={on_delete_chip('resource')}></Chip>)}
+
                   <FormControl>
-                    <FormLabel>What additional resources or services would you like to see in the library? multiple choices</FormLabel>
-                    <FormGroup>
-                      {options.desired_library_resource.map((option) => <FormControlLabel control={<Checkbox checked={desired_library_resources[option]} onChange={change_state_check("desired resources")} name={option} />} label={option} />)}
-                    </FormGroup>
+                    <FormLabel>Including yourself, how many family members do you have living in your home? </FormLabel>
+                    <Select
+                      value={edited.profile.family_members}
+                      onChange={change_state_select('family_members')}>
+                      {options.family_members.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
+                    </Select>
                   </FormControl>
 
                   <FormControl>
-                    <FormLabel> What do you expect to achieve from using our library? multiple choices</FormLabel>
-                    <FormGroup>
-                      {options.library_attendance_goal.map((option) => <FormControlLabel control={<Checkbox checked={goals[option]} onChange={change_state_check("goals")} name={option} />} label={option} />)}
-                    </FormGroup>
-                  </FormControl></>}
+                    <FormLabel>Which subject do you enjoy the most in school?</FormLabel>
+                    <Select
+                      value={edited.profile.favorite_subject}
+                      onChange={change_state_select('favorite_subject')}>
+                      {options.subjects.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
+                    </Select>
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel>What subject do you believe will be most useful for your future career?</FormLabel>
+                    <Select
+                      value={edited.profile.percieved_most_useful_subject}
+                      onChange={change_state_select('percieved_most_useful_subject')}>
+                      {options.subjects.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
+                    </Select>
+                  </FormControl>
+
+                  <FormControl >
+                    <FormLabel>What subject do you find most difficult in school and need help with?</FormLabel>
+                    <Select
+                      value={edited.profile.percieved_most_difficult_subject}
+                      onChange={change_state_select('percieved_most_difficult_subject')}>
+                      {options.subjects.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
+                    </Select>
+                  </FormControl>
+
+                  {edited.profile.library_attendance_goal.map((goal) => <Chip label={goal} onDelete={on_delete_chip('goal')}></Chip>)}
+                </>}
               </div>}
             </Container>
             <Container>
@@ -151,11 +136,56 @@ function Patron({ patron }: { patron: patron }) {
                   <Typography>It takes them {patron.profile.library_travel_time} to get to the library</Typography>
                   <Typography>Which they discovered by: {patron.profile.library_discovery_method}</Typography></>}
                 {edit && <>
-                  <FormControl>
-                    <FormLabel>What are the main obstacles or challenges that have prevented you from continuing or completing your education?</FormLabel>
-                    <FormGroup>
-                      {options.barriers_to_education.map((option) => <FormControlLabel control={<Checkbox checked={barriers_to_education[option]} onChange={change_state_check("barriers to education")} name={option} />} label={option} />)}
-                    </FormGroup>
+                  {edited.profile.barriers_to_education.map((barrier) => <Chip label={barrier} onDelete={on_delete_chip('barrier')}></Chip>)}
+                  <FormControl >
+                    <FormLabel>What is your current family status?</FormLabel>
+                    <RadioGroup
+                      value={edited.profile.family_status}
+                      onChange={change_state_text("family_status")}>
+                      {options.family_statuses.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+                    </RadioGroup>
+                  </FormControl>
+                  <FormControl >
+                    <FormLabel>Including yourself, how many family members do you have living in your home? </FormLabel>
+                    <Select
+                      value={edited.profile.family_members}
+                      onChange={change_state_select('family_members')}>
+                      {options.family_members.map((level) => { return (<MenuItem value={level}>{level}</MenuItem>) })}
+                    </Select>
+                  </FormControl>
+                  <FormControl >
+                    <FormLabel>How many members of your family have jobs that provide income?</FormLabel>
+                    <RadioGroup
+                      value={edited.profile.family_members_with_income}
+                      onChange={change_state_text("family_members_with_income")}>
+                      {options.family_members_with_income.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+                    </RadioGroup>
+                  </FormControl>
+                  <FormControl >
+                    <FormLabel>How would you rate the level of support you receive from your family?</FormLabel>
+                    <RadioGroup
+                      value={edited.profile.family_support_level}
+                      onChange={change_state_text("family_support_level")}>
+                      {options.family_support_level.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+                    </RadioGroup>
+                  </FormControl>
+
+                  <FormControl >
+                    <FormLabel> How long does it take you to travel to the library?</FormLabel>
+                    <RadioGroup
+                      value={edited.profile.library_travel_time}
+                      onChange={change_state_text("library_travel_time")}>
+                      {options.library_travel_time.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+                    </RadioGroup>
+                  </FormControl>
+
+                  <FormControl >
+                    <FormLabel>How did you hear about our library?</FormLabel>
+                    <RadioGroup
+                      value={edited.profile.library_discovery_method}
+                      onChange={change_state_text("library_discovery_method")}>
+                      {options.library_discovery_method.map((option) => <FormControlLabel value={option} control={<Radio />} label={option} />)}
+                    </RadioGroup>
                   </FormControl>
                 </>}
               </div>}
