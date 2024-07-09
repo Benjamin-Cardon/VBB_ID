@@ -37,11 +37,47 @@ patrons.post('/register', async (req: Request, res: Response) => {
 patrons.post('/update_info', async (req: Request, res: Response) => {
   console.log("Recieved Request to change patron info")
   const { modified_patron_profile, session_id } = req.body;
-  console.log(modified_patron_profile);
   const result = await client.query("SELECT librarian_id FROM librarian_logins WHERE session_id = $1", [session_id])
   if (result.rows.length > 0) {
+    const query_string = `UPDATE public.patrons
+    SET
+    first_name = $1,
+    last_name = $2,
+    immediate_family_members = $3,
+    family_status = $4,
+    family_members_with_income = $5,
+    barriers_to_education = $6,
+    family_support_level = $7,
+    favorite_subject = $8,
+    percieved_most_useful_subject = $9,
+    percieved_most_difficult_subject = $10,
+    library_discovery_method = $11,
+    library_travel_time = $12,
+    desired_library_resources = $13,
+    library_attendance_goal = $14
+    WHERE
+    patron_id = $15;
+    `
+    const update_result = await client.query(query_string, [
+      modified_patron_profile.profile.first_name,
+      modified_patron_profile.profile.last_name,
+      modified_patron_profile.profile.family_members,
+      modified_patron_profile.profile.family_status,
+      modified_patron_profile.profile.family_members_with_income,
+      modified_patron_profile.profile.barriers_to_education,
+      modified_patron_profile.profile.family_support_level,
+      modified_patron_profile.profile.favorite_subject,
+      modified_patron_profile.profile.percieved_most_useful_subject,
+      modified_patron_profile.profile.percieved_most_difficult_subject,
+      modified_patron_profile.profile.library_discovery_method,
+      modified_patron_profile.profile.library_travel_time,
+      modified_patron_profile.profile.desired_library_resource,
+      modified_patron_profile.profile.library_attendance_goal,
+      modified_patron_profile.patron_id
+    ])
+    console.log(update_result)
     res.status(200);
-    res.send("Auth Success");
+    res.send("Update Successful");
     //create_id(library);
   } else {
     res.status(401);
