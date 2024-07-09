@@ -5,7 +5,9 @@ import { patron, library_attendance_goal, barriers_to_education, desired_library
 import { options } from "./form_option_objects";
 import { KeyboardArrowDown, } from "@mui/icons-material";
 import { ChangeEvent } from "react";
+import { useAuth } from "./AuthContext";
 function Patron({ patron }: { patron: patron }) {
+  const session_id = useAuth().session_id;
 
   const [expanded, setExpanded] = useState(false);
   const [preferences, setPreferences] = useState(false);
@@ -87,6 +89,36 @@ function Patron({ patron }: { patron: patron }) {
     }
   }
 
+  const on_submit_changes = () => {
+    fetch("http://localhost:3000/patrons/update_info", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ modified_patron_profile: edited, session_id })
+    }).then(async (res) => {
+      if (res.body != null) {
+        let reader = res.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let stringified_body: string = '';
+        while (true) {
+          let { done, value } = await reader.read();
+          if (value != undefined) {
+            stringified_body = stringified_body.concat(decoder.decode(value));
+          }
+          if (done) {
+            break;
+          }
+        }
+        if (stringified_body == "Auth Success") {
+          console.log("Hooray, Auth Success")
+        } else {
+          console.log("No auth success. ")
+        }
+      }
+    })
+  }
+
   return (
     <Paper>
       <Box>
@@ -138,7 +170,7 @@ function Patron({ patron }: { patron: patron }) {
                       })}
                     </Select>
                   </FormControl>
-                  {/* <Button onClick={add_chip("desired_library_resource")} title="Add Desired Resource">Add Desired Resource</Button> */}
+                  <Button onClick={add_chip("desired_library_resource")} title="Add Desired Resource">Add Desired Resource</Button>
                   {edited.profile.desired_library_resource.map((resource) => <Chip label={resource} onDelete={on_delete_chip('desired_library_resource', resource)}></Chip>)}
 
                   <FormControl>
@@ -279,8 +311,8 @@ function Patron({ patron }: { patron: patron }) {
         </Stack>
         <Stack direction='row' alignContent='space-around' justifyContent='space-evenly'>
           <Button>Link to Mentorship</Button>
-          <Button onClick={on_edit}>Edit</Button>
-          <Button>Save Changes</Button>
+          <Button onClick={on_edit}>{edit ? "Cancel Edit" : "Edit"}</Button>
+          {edit && <Button onClick={on_submit_changes}>Save Changes</Button>}
         </Stack>
       </Container>}
     </Paper >

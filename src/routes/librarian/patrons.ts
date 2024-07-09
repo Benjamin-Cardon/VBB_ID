@@ -34,6 +34,21 @@ patrons.post('/register', async (req: Request, res: Response) => {
   }
 })
 
+patrons.post('/update_info', async (req: Request, res: Response) => {
+  console.log("Recieved Request to change patron info")
+  const { modified_patron_profile, session_id } = req.body;
+  console.log(modified_patron_profile);
+  const result = await client.query("SELECT librarian_id FROM librarian_logins WHERE session_id = $1", [session_id])
+  if (result.rows.length > 0) {
+    res.status(200);
+    res.send("Auth Success");
+    //create_id(library);
+  } else {
+    res.status(401);
+    res.send("Unauthorized Session");
+  }
+})
+
 patrons.get('/list', async (req: Request, res: Response) => {
   let session_id = req.query.session;
   console.log("Recieved Request for List:", session_id)
