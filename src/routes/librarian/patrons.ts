@@ -37,6 +37,7 @@ patrons.post('/register', async (req: Request, res: Response) => {
 patrons.post('/update_info', async (req: Request, res: Response) => {
   console.log("Recieved Request to change patron info")
   const { modified_patron_profile, session_id } = req.body;
+  console.log(modified_patron_profile)
   const result = await client.query("SELECT librarian_id FROM librarian_logins WHERE session_id = $1", [session_id])
   if (result.rows.length > 0) {
     const query_string = `UPDATE public.patrons

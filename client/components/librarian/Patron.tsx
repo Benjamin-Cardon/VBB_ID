@@ -6,9 +6,9 @@ import { options } from "./form_option_objects";
 import { KeyboardArrowDown, } from "@mui/icons-material";
 import { ChangeEvent } from "react";
 import { useAuth } from "./AuthContext";
-function Patron({ patron }: { patron: patron }) {
+function Patron({ patron_prop, update_fetched }: { patron_prop: patron, update_fetched: (patron: patron) => void }) {
   const session_id = useAuth().session_id;
-
+  const [patron, setPatron] = useState(patron_prop)
   const [expanded, setExpanded] = useState(false);
   const [preferences, setPreferences] = useState(false);
   const [situation, setSituation] = useState(false);
@@ -110,13 +110,19 @@ function Patron({ patron }: { patron: patron }) {
             break;
           }
         }
-        if (stringified_body == "Auth Success") {
-          console.log("Hooray, Auth Success")
+        if (stringified_body == "Update Successful") {
+          handle_update_success();
+
         } else {
           console.log("No auth success. ")
         }
       }
     })
+  }
+  const handle_update_success = () => {
+    update_fetched(edited)
+    setPatron(edited)
+    setEdit(false)
   }
 
   return (

@@ -78,6 +78,12 @@ function Patrons(patron_props: props) {
     console.log(filtered_patrons)
   }, [page])
 
+  let update_fetched_patrons = (patron: patron) => {
+    let new_fetched = [...fetched_patrons];
+    let ind = new_fetched.findIndex((patr) => patron.patron_id == patr.patron_id);
+    new_fetched[ind] = patron;
+    set_fetched_patrons(new_fetched);
+  }
 
   let on_search_patrons = function () {
     let patrons = fetched_patrons.filter((patron) => {
@@ -164,7 +170,7 @@ function Patrons(patron_props: props) {
     </Container>
     <Container>
       {displayed_patrons.map((patron) => {
-        return (<Patron patron={patron} />)
+        return (<Patron patron_prop={patron} update_fetched={update_fetched_patrons} />)
       })}
       <Pagination count={page_count} page={page} onChange={on_page_change} />
     </Container>
