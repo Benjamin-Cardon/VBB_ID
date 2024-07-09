@@ -17,6 +17,7 @@ function Patron({ patron }: { patron: patron }) {
   const on_expand = () => {
     setExpanded(!expanded);
     setEdit(false);
+    setEdited(patron);
   }
 
   const on_edit = () => {
@@ -25,9 +26,16 @@ function Patron({ patron }: { patron: patron }) {
 
   const on_preferences = () => setPreferences(!preferences)
   const on_situation = () => setSituation(!situation)
-  const on_delete_chip = (state: string) => {
-
+  const on_delete_chip = (state: 'desired_library_resource' | 'library_attendance_goal' | 'barriers_to_education', value: any) => {
+    return () => {
+      console.log(value, state)
+      let ind = edited.profile[state].findIndex((val) => { return val == value });
+      let obj = { ...edited };
+      obj.profile[state].splice(ind, 1);
+      setEdited(obj);
+    }
   }
+
   function change_state_select(state: string) {
     return (e: SelectChangeEvent) => {
       let obj = { ...edited };
@@ -83,7 +91,7 @@ function Patron({ patron }: { patron: patron }) {
                   <Typography>Most useful subject: {patron.profile.percieved_most_useful_subject}</Typography>
                   <Typography>Most difficult subject: {patron.profile.percieved_most_difficult_subject}</Typography></>}
                 {edit && <>
-                  {edited.profile.desired_library_resource.map((resource) => <Chip label={resource} onDelete={on_delete_chip('resource')}></Chip>)}
+                  {edited.profile.desired_library_resource.map((resource) => <Chip label={resource} onDelete={on_delete_chip('desired_library_resource', resource)}></Chip>)}
 
                   <FormControl>
                     <FormLabel>Including yourself, how many family members do you have living in your home? </FormLabel>
@@ -121,7 +129,7 @@ function Patron({ patron }: { patron: patron }) {
                     </Select>
                   </FormControl>
 
-                  {edited.profile.library_attendance_goal.map((goal) => <Chip label={goal} onDelete={on_delete_chip('goal')}></Chip>)}
+                  {edited.profile.library_attendance_goal.map((goal) => <Chip label={goal} onDelete={on_delete_chip('library_attendance_goal', goal)}></Chip>)}
                 </>}
               </div>}
             </Container>
@@ -136,7 +144,7 @@ function Patron({ patron }: { patron: patron }) {
                   <Typography>It takes them {patron.profile.library_travel_time} to get to the library</Typography>
                   <Typography>Which they discovered by: {patron.profile.library_discovery_method}</Typography></>}
                 {edit && <>
-                  {edited.profile.barriers_to_education.map((barrier) => <Chip label={barrier} onDelete={on_delete_chip('barrier')}></Chip>)}
+                  {edited.profile.barriers_to_education.map((barrier) => <Chip label={barrier} onDelete={on_delete_chip('barriers_to_education', barrier)}></Chip>)}
                   <FormControl >
                     <FormLabel>What is your current family status?</FormLabel>
                     <RadioGroup
