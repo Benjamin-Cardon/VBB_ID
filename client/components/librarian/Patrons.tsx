@@ -16,19 +16,19 @@ const patron_dummy: patron = {
     last_name: "Appleseed",
     gender: "male",
     grade_level: '6',
-    library_attendance_goal: 'Utilize a quiet space for studying',
+    library_attendance_goal: ['Utilize a quiet space for studying'],
     date: null,
     family_members_with_income: '3 or more',
     family_members: '10 or More',
     family_status: 'Orphaned (both parents deceased)',
     family_support_level: '5',
     favorite_subject: 'Sciences: Biology, Chemistry, Physics, and advanced sciences.',
-    barriers_to_education: 'Family Responsibilities: Need to work or take care of siblings',
+    barriers_to_education: ['Family Responsibilities: Need to work or take care of siblings'],
     percieved_most_difficult_subject: 'Mathematics',
     percieved_most_useful_subject: 'Sciences: Biology, Chemistry, Physics, and advanced sciences.',
     library_discovery_method: 'Community outreach',
     library_travel_time: 'More than 4 hours',
-    desired_library_resource: 'Art supplies',
+    desired_library_resource: ['Art supplies'],
   }
 }
 
