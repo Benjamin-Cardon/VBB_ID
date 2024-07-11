@@ -1,13 +1,16 @@
 import { Button, Card, CardActions, Container, Stack } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { props } from "../Librarian";
 import { useAuth } from "./AuthContext";
+import MentorshipConnectModal from "./MentorshipConnectModal";
 function LibrarianMenu(menu_props: props) {
   let on_navigate = (destination: string): void => {
     menu_props.changePage(destination);
   }
   const auth = useAuth();
   console.log("We got to menu with auth:", auth.session_id);
+  const [open, setOpen] = useState(false);
+
 
   return (<div>
     <div>
@@ -30,6 +33,12 @@ function LibrarianMenu(menu_props: props) {
             </CardActions>
           </Card>
         </Stack>
+        <Card>
+          <CardActions>
+            <Button onClick={(e) => { setOpen(true) }}>Open Modal</Button>
+          </CardActions>
+        </Card>
+        <MentorshipConnectModal open_state={open} close={() => { setOpen(!open) }}></MentorshipConnectModal>
       </Container>
 
 

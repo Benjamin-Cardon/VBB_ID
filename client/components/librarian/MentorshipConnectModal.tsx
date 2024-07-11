@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Modal, Typography } from "@mui/material";
+import { Box, Modal, Typography, Button } from "@mui/material";
 interface mentorship_props {
   open_state: boolean,
   close: () => void
@@ -17,9 +17,10 @@ const style = {
 };
 
 function MentorshipConnectModal(props: mentorship_props) {
-  return (<Modal open={props.open_state} onClose={close}>
+  return (<Modal open={props.open_state} onClose={props.close}>
     <Box sx={style}>
       <Typography>A Modal Portal to the other Database</Typography>
+      <Button onClick={props.close}>Close Modal</Button>
     </Box>
   </Modal>)
 }
