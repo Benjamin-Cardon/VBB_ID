@@ -8,7 +8,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { options } from "./form_option_objects";
 import { useAuth } from "./AuthContext";
-import MentorshipConnectModal from "./MentorshipConnectModal";
+import MentorshipConnectModal from "./mentorship_components/MentorshipConnectModal";
 
 function RegisterPatron(register_props: props) {
   const session_id = useAuth().session_id;

@@ -11,8 +11,8 @@ function LibrarianMenu(menu_props: props) {
   const auth = useAuth();
   console.log("We got to menu with auth:", auth.session_id);
   const [open, setOpen] = useState(false);
-  const fetch = () => {
-    return {} as mentorship_props;
+  const fetch_mentorship_info = () => {
+    return {} as Array<mentorship_info>;
   }
 
   return (<div>
@@ -41,7 +41,7 @@ function LibrarianMenu(menu_props: props) {
             <Button onClick={(e) => { setOpen(true) }}>Open Modal</Button>
           </CardActions>
         </Card>
-        <MentorshipConnectModal open_state={open} close={() => { setOpen(!open) }}></MentorshipConnectModal>
+        <MentorshipConnectModal open_state={open} mentorship_students={fetch_mentorship_info()} close={() => { setOpen(!open) }}></MentorshipConnectModal>
       </Container>
 
 

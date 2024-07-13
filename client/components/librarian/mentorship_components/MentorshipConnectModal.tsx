@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Modal, Typography, Button } from "@mui/material";
+import { Box, Modal, Typography, Button, Stack, TextField, FormControl, Chip, Select, MenuItem, Pagination } from "@mui/material";
 import MentorshipSearchCard from "./MentorshipSearchCard";
 
 export type mentorship_info = {
@@ -27,6 +27,31 @@ function MentorshipConnectModal(props: mentorship_props) {
   return (<Modal open={props.open_state} onClose={props.close}>
     <Box sx={style}>
       <Typography>A Modal Portal to the other Database</Typography>
+      <TextField></TextField>
+      <FormControl>
+        <Select>
+          <MenuItem></MenuItem>
+        </Select>
+      </FormControl>
+      <Button> Add Filter</Button>
+      <Chip></Chip>
+
+      <FormControl>
+        <Select>
+          <MenuItem></MenuItem>
+        </Select>
+      </FormControl>
+      <Button>Search</Button>
+
+      <Stack>
+        {props.mentorship_students.map((student_info) => {
+          return (<MentorshipSearchCard student_info={student_info} ></MentorshipSearchCard>)
+        })}
+      </Stack>
+      <Pagination>
+
+      </Pagination>
+
       <Button onClick={props.close}>Close Modal</Button>
     </Box>
   </Modal>)
