@@ -2,8 +2,26 @@ import React from "react";
 import { Box, Modal, Typography, Button, Stack, TextField, FormControl, Chip, Select, MenuItem, Pagination } from "@mui/material";
 import MentorshipSearchCard from "./MentorshipSearchCard";
 
-export type mentorship_info = {
+type mentoring_session = {
+  mentor: string,
+  date: string,
+  attended: boolean,
+}
 
+export type mentorship_info = {
+  mentorship_id: Number,
+  last_login: string,
+  username: string,
+  first_name: string,
+  last_name: string,
+  date_joined: string,
+  date_of_birth: string,
+  profile_image: string,
+  gender: "male" | "female",
+  assigned_library_id: Number,
+  bio: string,
+  sessions: Array<mentoring_session>,
+  mentors: Array<string>,
 }
 
 export interface mentorship_props {

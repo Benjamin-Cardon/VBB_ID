@@ -12,7 +12,8 @@ function LibrarianMenu(menu_props: props) {
   console.log("We got to menu with auth:", auth.session_id);
   const [open, setOpen] = useState(false);
   const fetch_mentorship_info = () => {
-    return {} as Array<mentorship_info>;
+    const dummy: mentorship_info = { mentorship_id: 1, last_login: "Yesterday", username: "DummyData", first_name: "John", last_name: "Doe", date_joined: "January 1st, 1970", date_of_birth: "January 1st, 1955", profile_image: "path/to/something", gender: "male", assigned_library_id: 13, bio: "Just a fake man trying to get a fake education", sessions: [{ mentor: "The sound of Silence", date: "Always", attended: false }], mentors: ["Jane Jenneric"] }
+    return [dummy];
   }
 
   return (<div>
