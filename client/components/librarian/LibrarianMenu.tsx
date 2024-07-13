@@ -2,7 +2,8 @@ import { Button, Card, CardActions, Container, Stack } from "@mui/material";
 import React, { useState } from "react";
 import { props } from "../Librarian";
 import { useAuth } from "./AuthContext";
-import MentorshipConnectModal from "./MentorshipConnectModal";
+import { mentorship_props, mentorship_info } from "./mentorship_components/MentorshipConnectModal";
+import MentorshipConnectModal from "./mentorship_components/MentorshipConnectModal";
 function LibrarianMenu(menu_props: props) {
   let on_navigate = (destination: string): void => {
     menu_props.changePage(destination);
@@ -10,7 +11,9 @@ function LibrarianMenu(menu_props: props) {
   const auth = useAuth();
   console.log("We got to menu with auth:", auth.session_id);
   const [open, setOpen] = useState(false);
-
+  const fetch = () => {
+    return {} as mentorship_props;
+  }
 
   return (<div>
     <div>

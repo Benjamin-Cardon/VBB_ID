@@ -1,7 +1,14 @@
 import React from "react";
 import { Box, Modal, Typography, Button } from "@mui/material";
-interface mentorship_props {
+import MentorshipSearchCard from "./MentorshipSearchCard";
+
+export type mentorship_info = {
+
+}
+
+export interface mentorship_props {
   open_state: boolean,
+  mentorship_students: Array<mentorship_info>,
   close: () => void
 }
 const style = {
