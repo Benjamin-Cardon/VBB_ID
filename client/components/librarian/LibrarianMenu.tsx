@@ -14,12 +14,13 @@ function LibrarianMenu(menu_props: props) {
   const [mentorship, setMentorship] = useState([] as Array<mentorship_info>)
 
   useEffect(() => {
+
+    console.log(auth.session_id);
     fetch_mentorship_info();
-    console.log("Used Effect")
 
   }, []);
   const fetch_mentorship_info = () => {
-    fetch(`http://localhost:3000/patrons/list?session=${auth.session_id}`)
+    fetch(`http://localhost:3000/portal/student_info?session_id=${auth.session_id}`)
       .then(async (res) => {
         if (res.body != null) {
           let reader = res.body.getReader();
@@ -66,7 +67,7 @@ function LibrarianMenu(menu_props: props) {
         </Stack>
         <Card>
           <CardActions>
-            <Button onClick={(e) => { setOpen(true) }}>Open Modal</Button>
+            <Button onClick={(e) => { setOpen(true); fetch_mentorship_info(); }}>Open Modal</Button>
           </CardActions>
         </Card>
         <MentorshipConnectModal open_state={open} mentorship_students={mentorship} close={() => { setOpen(!open) }}></MentorshipConnectModal>
