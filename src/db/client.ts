@@ -11,7 +11,13 @@ const client = new Client({
   password: process.env.PGPASSWORD,
 })
 
-
+export const mentorship = new Client({
+  host: process.env.PGHOST,
+  port: Number(process.env.PGPORT),
+  database: process.env.PGDATABASEMENTOR,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+})
 // client.connect()
 //   .then(() => {
 //     console.log("Connected to Client")
