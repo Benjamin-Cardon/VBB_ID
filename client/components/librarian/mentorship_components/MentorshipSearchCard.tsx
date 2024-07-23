@@ -5,6 +5,8 @@ import { Avatar, Box, IconButton, Icon, Paper, Typography } from "@mui/material"
 import { Male, Female, KeyboardArrowDown } from "@mui/icons-material";
 export interface mentorship_search_card_props {
   student_info: mentorship_info;
+  select_handler: (patron: any) => void;
+  selected: boolean;
 }
 
 function MentorshipSearchCard(props: mentorship_search_card_props) {
@@ -14,6 +16,10 @@ function MentorshipSearchCard(props: mentorship_search_card_props) {
   }
   const on_close = () => {
     setOpen(false);
+  }
+  const handle_select = (patron: any) => {
+    setOpen(false);
+    props.select_handler(patron);
   }
 
   return (<Paper>
@@ -26,8 +32,9 @@ function MentorshipSearchCard(props: mentorship_search_card_props) {
       <IconButton onClick={on_open} sx={{ justifyContent: 'flex-end' }} >
         <KeyboardArrowDown />
       </IconButton>
+      {props.selected && <Typography>This is selected</Typography>}
     </Box>
-    <MentorshipDetailsDisplay student_info={props.student_info} open={open} close_handler={on_close}></MentorshipDetailsDisplay>
+    <MentorshipDetailsDisplay student_info={props.student_info} open={open} close_handler={on_close} select_handler={props.select_handler}></MentorshipDetailsDisplay>
   </Paper>)
 }
 

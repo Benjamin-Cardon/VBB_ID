@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Modal, Typography, Button, Stack, TextField, FormControl, Chip, Select, MenuItem, Pagination } from "@mui/material";
 import MentorshipSearchCard from "./MentorshipSearchCard";
 
@@ -22,13 +22,16 @@ export type mentorship_info = {
   bio: string,
   sessions: Array<mentoring_session>,
   mentors: Array<string>,
+  user_id: string
 }
 
 export interface mentorship_props {
   open_state: boolean,
-  mentorship_students: Array<mentorship_info>,
-  close: () => void
+  close: () => void,
+  session_id: string,
+  select_patron: (patron: any) => void,
 }
+
 const style = {
   position: 'absolute' as 'absolute',
   top: '50%',
@@ -42,6 +45,47 @@ const style = {
 };
 
 function MentorshipConnectModal(props: mentorship_props) {
+
+  const [mentorship_students, set_mentorship_students] = useState([] as Array<mentorship_info>);
+  useEffect(() => {
+    fetch_mentorship_info((patrons: any) => { set_mentorship_students(patrons) })
+  }, [])
+  const [selected_patron, set_selected_patron] = useState(undefined as mentorship_info | undefined);
+
+  const fetch_mentorship_info = (func: Function) => {
+    fetch(`http://localhost:3000/portal/student_info?session_id=${props.session_id}`)
+      .then(async (res) => {
+        if (res.body != null) {
+          let reader = res.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          let stringified_body: string = '';
+          while (true) {
+            let { done, value } = await reader.read();
+            if (value != undefined) {
+              stringified_body = stringified_body.concat(decoder.decode(value));
+              console.log(stringified_body);
+            }
+            if (done) {
+              break;
+            }
+          }
+          let patrons = JSON.parse(stringified_body)
+          func(patrons)
+        }
+      })
+      .catch(error => {
+        console.error('Error reading stream:', error);
+      });
+  }
+
+  const choose_patron = (patron: any) => {
+    set_selected_patron(patron);
+  }
+
+  const select_patron = () => {
+    props.select_patron(selected_patron);
+  }
+
   return (<Modal open={props.open_state} onClose={props.close}>
     <Box sx={style}>
       <Typography>A Modal Portal to the other Database</Typography>
@@ -62,8 +106,8 @@ function MentorshipConnectModal(props: mentorship_props) {
       <Button>Search</Button>
 
       <Stack>
-        {props.mentorship_students.map((student_info) => {
-          return (<MentorshipSearchCard student_info={student_info} ></MentorshipSearchCard>)
+        {mentorship_students.map((student_info) => {
+          return (<MentorshipSearchCard student_info={student_info} select_handler={choose_patron} selected={selected_patron != undefined ? selected_patron.user_id == student_info.user_id : false}></MentorshipSearchCard>)
         })}
       </Stack>
       <Pagination>
@@ -71,6 +115,7 @@ function MentorshipConnectModal(props: mentorship_props) {
       </Pagination>
 
       <Button onClick={props.close}>Close Modal</Button>
+      <Button onClick={select_patron}> Select Patron</Button>
     </Box>
   </Modal>)
 }

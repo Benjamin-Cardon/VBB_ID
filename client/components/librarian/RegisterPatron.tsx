@@ -9,7 +9,6 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { options } from "./form_option_objects";
 import { useAuth } from "./AuthContext";
 import { state_toggle } from "../../types";
-import CheckIcon from '@mui/icons-material/Check';
 import MentorshipConnectModal from "./mentorship_components/MentorshipConnectModal";
 function RegisterPatron(register_props: props) {
   const session_id = useAuth().session_id;
@@ -187,38 +186,31 @@ function RegisterPatron(register_props: props) {
   }
 
   const handle_affiliated = function (e: React.ChangeEvent<HTMLInputElement>) {
-    if (!e.target.value) {
-      setAffiliated(false);
-    }
-    else {
+    if (affiliated == null) {
+      if (e.target.value == 'false') {
+        setAffiliated(false);
+      }
+      else {
+        set_affiliated_modal_open(true);
+      }
+    } else if (affiliated) {
+      setAffiliated(false)
+    } else {
       set_affiliated_modal_open(true);
     }
+
+  }
+  const handle_affiliation_close = function () {
+    set_affiliated_modal_open(false);
+    setAffiliated(false);
   }
 
-  const fetch_mentorship_info = () => {
-    fetch(`http://localhost:3000/portal/student_info?session_id=${session_id}`)
-      .then(async (res) => {
-        if (res.body != null) {
-          let reader = res.body.getReader();
-          const decoder = new TextDecoder('utf-8');
-          let stringified_body: string = '';
-          while (true) {
-            let { done, value } = await reader.read();
-            if (value != undefined) {
-              stringified_body = stringified_body.concat(decoder.decode(value));
-              console.log(stringified_body);
-            }
-            if (done) {
-              break;
-            }
-          }
-          let patrons = JSON.parse(stringified_body)
-        }
-      })
-      .catch(error => {
-        console.error('Error reading stream:', error);
-      });
+  const handle_select_patron = function (patron: any) {
+    set_affiliated_modal_open(false);
+    setAffiliated(true);
+    console.log(patron)
   }
+
   // we'll make a list of keys type later
   function change_state_text(state: string) {
     return (e: ChangeEvent<HTMLInputElement>) => {
@@ -287,6 +279,7 @@ function RegisterPatron(register_props: props) {
             </Button>
           </DialogActions>
         </Dialog>
+        <MentorshipConnectModal open_state={affiliated_modal_open} session_id={session_id != undefined ? session_id : ""} close={handle_affiliation_close} select_patron={handle_select_patron}></MentorshipConnectModal>
 
         <Stack
           direction="column"

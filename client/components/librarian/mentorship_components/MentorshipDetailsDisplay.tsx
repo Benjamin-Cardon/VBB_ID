@@ -5,7 +5,9 @@ export interface mentorship_details_display_props {
   student_info: mentorship_info;
   open: boolean;
   close_handler: () => void;
+  select_handler: (patron: any) => void;
 }
+
 const style = {
   position: 'absolute' as 'absolute',
   top: '50%',
@@ -19,11 +21,16 @@ const style = {
 };
 
 function MentorshipDetailsDisplay(props: mentorship_details_display_props) {
+  const handle_select = () => {
+    props.select_handler(props.student_info)
+    props.close_handler();
+  }
+
   return (<Modal open={props.open} onClose={props.close_handler} >
     <Box sx={style}>
       <Avatar></Avatar>
       <Typography></Typography>
-      <Button>Select</Button>
+      <Button onClick={handle_select}>Select</Button>
       <Button onClick={props.close_handler}>Cancel</Button>
     </Box>
   </Modal>)
