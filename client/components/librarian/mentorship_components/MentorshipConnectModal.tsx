@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Modal, Typography, Button, Stack, TextField, FormControl, Chip, Select, MenuItem, Pagination } from "@mui/material";
+import { Box, Modal, Typography, Button, Stack, Switch, TextField, FormControl, Chip, Select, MenuItem, Pagination } from "@mui/material";
 import MentorshipSearchCard from "./MentorshipSearchCard";
 
 export type mentorship_info = {
@@ -63,6 +63,7 @@ function MentorshipConnectModal(props: mentorship_props) {
     fetch_mentorship_info((patrons: any) => { set_mentorship_students(patrons) })
   }, [])
   const [selected_patron, set_selected_patron] = useState(undefined as mentorship_info | undefined);
+  const [seeHidden, setSeeHidden] = useState(false);
 
   const fetch_mentorship_info = (func: (fetched_info: Array<mentorship_info>) => void) => {
     fetch(`http://localhost:3000/portal/student_info?session_id=${props.session_id}`)
@@ -118,13 +119,22 @@ function MentorshipConnectModal(props: mentorship_props) {
       <Button>Search</Button>
 
       <Stack>
-        {mentorship_students.map((student_info) => {
+        {seeHidden && mentorship_students.map((student_info) => {
+          return (<MentorshipSearchCard student_info={student_info} select_handler={choose_patron} selected={selected_patron != undefined ? selected_patron.user_id == student_info.user_id : false}></MentorshipSearchCard>)
+        })}
+        {!seeHidden && mentorship_students.filter((student_info) => {
+          return !student_info.affiliated;
+        }).map((student_info) => {
           return (<MentorshipSearchCard student_info={student_info} select_handler={choose_patron} selected={selected_patron != undefined ? selected_patron.user_id == student_info.user_id : false}></MentorshipSearchCard>)
         })}
       </Stack>
       <Pagination>
 
       </Pagination>
+      <Box>
+        <Typography>See Students who have already been affiliated</Typography>
+        <Switch checked={seeHidden} onChange={() => setSeeHidden(!seeHidden)} ></Switch>
+      </Box>
 
       <Button onClick={props.close}>Close Modal</Button>
       <Button onClick={select_patron}> Select Patron</Button>

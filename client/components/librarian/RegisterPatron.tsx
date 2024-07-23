@@ -2,17 +2,18 @@ import React, { ChangeEvent } from "react";
 import { useState } from "react";
 import { TextField, FormControl, ToggleButton, RadioGroup, Radio, FormLabel, FormControlLabel, Select, Checkbox, FormGroup, Button, MenuItem, SelectChangeEvent, Stack, Divider, Container, Box, Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText, Typography } from "@mui/material";
 import { props } from "../Librarian";
-import { family_members, register_state, family_status, family_members_with_income } from "../../types";
+import { family_members, register_state, family_status, family_members_with_income, family_support_level, gender } from "../../types";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { options } from "./form_option_objects";
 import { useAuth } from "./AuthContext";
 import { state_toggle } from "../../types";
-import MentorshipConnectModal from "./mentorship_components/MentorshipConnectModal";
+import MentorshipConnectModal, { mentorship_info } from "./mentorship_components/MentorshipConnectModal";
 function RegisterPatron(register_props: props) {
   const session_id = useAuth().session_id;
   const init_values: register_state = {
+    mentorship_user_id: null,
     first_name: '',
     last_name: '',
     gender: '',
@@ -208,6 +209,7 @@ function RegisterPatron(register_props: props) {
   const handle_select_patron = function (patron: any) {
     set_affiliated_modal_open(false);
     setAffiliated(true);
+    mentorship_select(patron)
     console.log(patron)
   }
 
@@ -228,6 +230,19 @@ function RegisterPatron(register_props: props) {
       obj[state] = e.target.value;
       set_form_state(obj)
     };
+  }
+
+  function mentorship_select(patron: mentorship_info) {
+    set_form_state({
+      ...form_state,
+      first_name: patron.first_name,
+      mentorship_user_id: patron.user_id,
+      last_name: patron.last_name,
+      date: dayjs(patron.date_of_birth),
+      family_support_level: patron.family_support_level.toString() as family_support_level,
+      gender: patron.gender as gender,
+    })
+    setStudent("Student")
   }
 
   const change_state_check = (state: string) => {

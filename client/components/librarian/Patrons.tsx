@@ -79,31 +79,6 @@ function Patrons(patron_props: props) {
     console.log(filtered_patrons)
   }, [page])
 
-  const fetch_mentorship_info = () => {
-    fetch(`http://localhost:3000/portal/student_info?session_id=${session_id}`)
-      .then(async (res) => {
-        if (res.body != null) {
-          let reader = res.body.getReader();
-          const decoder = new TextDecoder('utf-8');
-          let stringified_body: string = '';
-          while (true) {
-            let { done, value } = await reader.read();
-            if (value != undefined) {
-              stringified_body = stringified_body.concat(decoder.decode(value));
-              console.log(stringified_body);
-            }
-            if (done) {
-              break;
-            }
-          }
-          let patrons = JSON.parse(stringified_body)
-        }
-      })
-      .catch(error => {
-        console.error('Error reading stream:', error);
-      });
-  }
-
   let update_fetched_patrons = (patron: patron) => {
     let new_fetched = [...fetched_patrons];
     let ind = new_fetched.findIndex((patr) => patron.patron_id == patr.patron_id);

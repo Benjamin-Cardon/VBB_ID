@@ -24,6 +24,7 @@ export interface login_state {
 }
 
 export interface register_state {
+  mentorship_user_id: null | string;
   first_name: string;
   last_name: string;
   gender: gender | '';
