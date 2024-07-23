@@ -42,7 +42,7 @@ function Patrons(patron_props: props) {
   const [page_count, set_page_count] = useState(0);
   const [orderby, setOrder] = useState('First Name');
   const [mentorship_modal_open, set_mentorship_modal_open] = useState(false);
-
+  const [handle_select, set_handle_select] = useState(() => () => { })
   useEffect(() => {
     console.log("Used Effect")
     fetch(`http://localhost:3000/patrons/list?session=${session_id}`)
@@ -143,14 +143,29 @@ function Patrons(patron_props: props) {
   function on_page_change(event: React.ChangeEvent<unknown>, page: number) {
     setPage(page);
   }
-  function handle_select_patron() { }
-  function on_close_mentorship() { }
+  function on_close_mentorship() {
+    set_mentorship_modal_open(false);
+  }
+
+  function handle_select_creator(patron: patron) {
+    return () => {
+
+    }
+  }
+
+  function open_mentorship_creator(patron: patron) {
+    return () => {
+      set_mentorship_modal_open(true);
+      set_handle_select(handle_select_creator(patron))
+    }
+  }
+
 
   return (<Box>
     <Box>
       <Button onClick={(e) => { patron_props.changePage('LibrarianMenu') }}>Main Menu</Button>
     </Box>
-    <MentorshipConnectModal session_id={session_id != undefined ? session_id : ""} open_state={mentorship_modal_open} close={on_close_mentorship} select_patron={handle_select_patron}></MentorshipConnectModal>
+    <MentorshipConnectModal session_id={session_id != undefined ? session_id : ""} open_state={mentorship_modal_open} close={on_close_mentorship} select_patron={handle_select}></MentorshipConnectModal>
     <Container>
       <Typography />
       <TextField label="Search Name" value={search_text} onChange={(e) => { set_search_text(e.target.value) }} />

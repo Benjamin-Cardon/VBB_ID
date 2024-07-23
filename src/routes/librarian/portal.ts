@@ -18,7 +18,27 @@ portal.get('/student_info', async (req: Request, res: Response) => {
     // We want to get the correct library id.
     const mentorship_library_result = await client.query("SELECT libraries.mentorship_library_id, libraries.id FROM libraries JOIN librarians ON libraries.id = librarians.library_id WHERE librarians.id = $1", [session_result.rows[0].librarian_id])
     const query_patrons = ` SELECT mentorship_user_id FROM patrons WHERE library_id = $1 AND mentorship_user_id IS NOT NULL`;
-    const query_mentorship = `SELECT * FROM users_user JOIN profiles_studentprofile ON users_user.id =profiles_studentprofile.user_id WHERE users_user.is_student = true AND profiles_studentprofile.assigned_library_id=$1`;
+    const query_mentorship = `SELECT
+     users_user.last_login,
+     users_user.username,
+     users_user.first_name,
+     users_user.last_name,
+     users_user.email,
+     users_user.time_zone,
+     users_user.date_of_birth,
+     users_user."profileImage",
+     users_user.gender,
+     profiles_studentprofile.id,
+     profiles_studentprofile.user_id,
+     profiles_studentprofile.bio,
+     profiles_studentprofile.family_status,
+     profiles_studentprofile.family_support_level,
+     profiles_studentprofile.grade_level,
+     profiles_studentprofile.graduation_obstacle
+     FROM users_user JOIN profiles_studentprofile
+     ON users_user.id =profiles_studentprofile.user_id
+     WHERE users_user.is_student = true
+     AND profiles_studentprofile.assigned_library_id=$1`;
     const affiliated_patrons_result = await client.query(query_patrons, [mentorship_library_result.rows[0].id])
     //console.log("Ids which have already been affiliated", affiliated_patrons_result)
     const mentorship_patrons_result = await mentorship.query(query_mentorship, [mentorship_library_result.rows[0].mentorship_library_id])

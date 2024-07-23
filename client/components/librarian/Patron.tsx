@@ -6,6 +6,12 @@ import { options } from "./form_option_objects";
 import { KeyboardArrowDown, } from "@mui/icons-material";
 import { ChangeEvent } from "react";
 import { useAuth } from "./AuthContext";
+
+export type patron_props = {
+  patron_prop: patron,
+  update_fetched: (patron: patron) => void,
+  open_mentorship: () => {}
+}
 function Patron({ patron_prop, update_fetched }: { patron_prop: patron, update_fetched: (patron: patron) => void }) {
   const session_id = useAuth().session_id;
   const [patron, setPatron] = useState(patron_prop)
