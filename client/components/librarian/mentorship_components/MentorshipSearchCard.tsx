@@ -17,10 +17,6 @@ function MentorshipSearchCard(props: mentorship_search_card_props) {
   const on_close = () => {
     setOpen(false);
   }
-  const handle_select = (patron: any) => {
-    setOpen(false);
-    props.select_handler(patron);
-  }
 
   return (<Paper>
     <Box>

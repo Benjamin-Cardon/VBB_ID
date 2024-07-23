@@ -5,7 +5,7 @@ export interface mentorship_details_display_props {
   student_info: mentorship_info;
   open: boolean;
   close_handler: () => void;
-  select_handler: (patron: any) => void;
+  select_handler: (patron: mentorship_info) => void;
 }
 
 const style = {

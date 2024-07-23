@@ -2,27 +2,39 @@ import React, { useEffect, useState } from "react";
 import { Box, Modal, Typography, Button, Stack, TextField, FormControl, Chip, Select, MenuItem, Pagination } from "@mui/material";
 import MentorshipSearchCard from "./MentorshipSearchCard";
 
-type mentoring_session = {
-  mentor: string,
-  date: string,
-  attended: boolean,
-}
-
 export type mentorship_info = {
-  mentorship_id: Number,
-  last_login: string,
-  username: string,
-  first_name: string,
-  last_name: string,
+  affiliated: boolean,
+  approval_status: string,
+  assigned_library_id: string,
+  bio: string,
   date_joined: string,
   date_of_birth: string,
-  profile_image: string,
-  gender: "male" | "female",
-  assigned_library_id: Number,
-  bio: string,
-  sessions: Array<mentoring_session>,
-  mentors: Array<string>,
-  user_id: string
+  email: string,
+  family_status: string,
+  family_support_level: Number,
+  first_name: string,
+  gender: string,
+  grade_level: Number,
+  graduation_obstacle: string,
+  id: string,
+  is_active: boolean,
+  is_email_verified: boolean,
+  is_librarian: boolean,
+  is_mentor: boolean,
+  is_onboarded: boolean,
+  is_staff: boolean,
+  is_student: boolean,
+  is_superuser: boolean,
+  is_verified: boolean,
+  last_login: string,
+  last_name: string,
+  name: string,
+  password: string,
+  profileImage: string,
+  role: Number,
+  time_zone: string,
+  user_id: string,
+  username: string,
 }
 
 export interface mentorship_props {
@@ -52,7 +64,7 @@ function MentorshipConnectModal(props: mentorship_props) {
   }, [])
   const [selected_patron, set_selected_patron] = useState(undefined as mentorship_info | undefined);
 
-  const fetch_mentorship_info = (func: Function) => {
+  const fetch_mentorship_info = (func: (fetched_info: Array<mentorship_info>) => void) => {
     fetch(`http://localhost:3000/portal/student_info?session_id=${props.session_id}`)
       .then(async (res) => {
         if (res.body != null) {
@@ -69,7 +81,7 @@ function MentorshipConnectModal(props: mentorship_props) {
               break;
             }
           }
-          let patrons = JSON.parse(stringified_body)
+          let patrons: Array<mentorship_info> = JSON.parse(stringified_body)
           func(patrons)
         }
       })
@@ -78,7 +90,7 @@ function MentorshipConnectModal(props: mentorship_props) {
       });
   }
 
-  const choose_patron = (patron: any) => {
+  const choose_patron = (patron: mentorship_info) => {
     set_selected_patron(patron);
   }
 

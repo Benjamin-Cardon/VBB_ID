@@ -5,9 +5,8 @@ import { Button, Box, Container, TextField, Typography, Pagination, FormControl,
 import Patron from "./Patron";
 import { patron } from "../../types";
 import { useAuth } from "./AuthContext";
-import { ImageNotSupportedSharp } from "@mui/icons-material";
 import MentorshipConnectModal from "./mentorship_components/MentorshipConnectModal";
-import dayjs from "dayjs";
+
 const patron_dummy: patron = {
   patron_id: "Yahoo",
   last_login: null,
@@ -42,6 +41,7 @@ function Patrons(patron_props: props) {
   const [page, setPage] = useState(0);
   const [page_count, set_page_count] = useState(0);
   const [orderby, setOrder] = useState('First Name');
+  const [mentorship_modal_open, set_mentorship_modal_open] = useState(false);
 
   useEffect(() => {
     console.log("Used Effect")
@@ -168,11 +168,14 @@ function Patrons(patron_props: props) {
   function on_page_change(event: React.ChangeEvent<unknown>, page: number) {
     setPage(page);
   }
+  function handle_select_patron() { }
+  function on_close_mentorship() { }
 
   return (<Box>
     <Box>
       <Button onClick={(e) => { patron_props.changePage('LibrarianMenu') }}>Main Menu</Button>
     </Box>
+    <MentorshipConnectModal session_id={session_id != undefined ? session_id : ""} open_state={mentorship_modal_open} close={on_close_mentorship} select_patron={handle_select_patron}></MentorshipConnectModal>
     <Container>
       <Typography />
       <TextField label="Search Name" value={search_text} onChange={(e) => { set_search_text(e.target.value) }} />
