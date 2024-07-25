@@ -29,7 +29,14 @@ function MentorshipDetailsDisplay(props: mentorship_details_display_props) {
   return (<Modal open={props.open} onClose={props.close_handler} >
     <Box sx={style}>
       <Avatar></Avatar>
-      <Typography></Typography>
+      <Typography>First Name: {props.student_info.first_name}</Typography>
+      <Typography>Last Name: {props.student_info.last_name}</Typography>
+      <Typography>Username: {props.student_info.username}</Typography>
+      <Typography>Email: {props.student_info.email}</Typography>
+      <Typography>Birthdate: {props.student_info.date_of_birth}</Typography>
+      <Typography>Gender: {props.student_info.gender}</Typography>
+      <Typography>Last Login: {props.student_info.last_login}</Typography>
+      <Typography>Bio: {props.student_info.bio}</Typography>
       <Button onClick={handle_select}>Select</Button>
       <Button onClick={props.close_handler}>Cancel</Button>
     </Box>
