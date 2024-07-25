@@ -6,7 +6,7 @@ import Patron from "./Patron";
 import { patron } from "../../types";
 import { useAuth } from "./AuthContext";
 import MentorshipConnectModal from "./mentorship_components/MentorshipConnectModal";
-
+import { mentorship_info } from "./mentorship_components/MentorshipConnectModal";
 const patron_dummy: patron = {
   patron_id: "Yahoo",
   last_login: null,
@@ -42,9 +42,9 @@ function Patrons(patron_props: props) {
   const [page_count, set_page_count] = useState(0);
   const [orderby, setOrder] = useState('First Name');
   const [mentorship_modal_open, set_mentorship_modal_open] = useState(false);
-  const [handle_select, set_handle_select] = useState(() => () => { })
+  const [handle_select, set_handle_select] = useState(() => (patron: mentorship_info) => { })
+
   useEffect(() => {
-    console.log("Used Effect")
     fetch(`http://localhost:3000/patrons/list?session=${session_id}`)
       .then(async (res) => {
         if (res.body != null) {
@@ -76,7 +76,6 @@ function Patrons(patron_props: props) {
 
   useEffect(() => {
     set_displayed_patrons(filtered_patrons.slice((page - 1) * 10, page * 10 < filtered_patrons.length ? page * 10 : filtered_patrons.length))
-    console.log(filtered_patrons)
   }, [page])
 
   let update_fetched_patrons = (patron: patron) => {
@@ -148,15 +147,43 @@ function Patrons(patron_props: props) {
   }
 
   function handle_select_creator(patron: patron) {
-    return () => {
+    return () => (mentorship_patron: mentorship_info) => {
+      fetch("http://localhost:3000/patrons/update_info", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ modified_patron_profile: { ...patron, profile: { ...patron.profile, mentorship_user_id: mentorship_patron.user_id } }, session_id })
+      }).then(async (res) => {
+        if (res.body != null) {
+          let reader = res.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          let stringified_body: string = '';
+          while (true) {
+            let { done, value } = await reader.read();
+            if (value != undefined) {
+              stringified_body = stringified_body.concat(decoder.decode(value));
+            }
+            if (done) {
+              break;
+            }
+          }
+          if (stringified_body == "Update Successful") {
+            console.log("Success! Now we need to make a handler")
+          } else {
+            console.log("No auth success. ")
+          }
+        }
+      })
+
 
     }
   }
 
   function open_mentorship_creator(patron: patron) {
     return () => {
-      set_mentorship_modal_open(true);
       set_handle_select(handle_select_creator(patron))
+      set_mentorship_modal_open(true);
     }
   }
 
@@ -189,7 +216,7 @@ function Patrons(patron_props: props) {
     </Container>
     <Container>
       {displayed_patrons.map((patron) => {
-        return (<Patron patron_prop={patron} update_fetched={update_fetched_patrons} />)
+        return (<Patron patron_prop={patron} update_fetched={update_fetched_patrons} open_mentorship={open_mentorship_creator(patron)} />)
       })}
       <Pagination count={page_count} page={page} onChange={on_page_change} />
     </Container>

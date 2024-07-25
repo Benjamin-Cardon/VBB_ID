@@ -4,6 +4,7 @@ import MentorshipSearchCard from "./MentorshipSearchCard";
 import { FollowTheSignsRounded, SearchTwoTone } from "@mui/icons-material";
 import dayjs from "dayjs";
 import { createIsAfterIgnoreDatePart } from "@mui/x-date-pickers/internals/utils/time-utils";
+import e from "express";
 
 export type mentorship_info = {
   affiliated: boolean,
@@ -33,7 +34,7 @@ export interface mentorship_props {
   open_state: boolean,
   close: () => void,
   session_id: string,
-  select_patron: (patron: any) => void,
+  select_patron: (patron: mentorship_info) => void,
 }
 
 const style = {
@@ -177,7 +178,14 @@ function MentorshipConnectModal(props: mentorship_props) {
   }
 
   const select_patron = () => {
-    props.select_patron(selected_patron);
+    if (selected_patron == undefined) {
+      return;
+    } else {
+      console.log(typeof props.select_patron)
+      //@ts-ignore
+      props.select_patron(selected_patron);
+    }
+
   }
 
   const on_text_search = (option: string) => {

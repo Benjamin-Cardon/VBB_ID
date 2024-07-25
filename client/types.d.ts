@@ -66,6 +66,7 @@ export type patron = {
     library_travel_time: library_travel_time | "";
     desired_library_resource: desired_library_resource[];
     library_attendance_goal: library_attendance_goal[];
+    mentorship_user_id?: string;
   };
 }
 

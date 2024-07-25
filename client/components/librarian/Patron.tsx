@@ -10,11 +10,11 @@ import { useAuth } from "./AuthContext";
 export type patron_props = {
   patron_prop: patron,
   update_fetched: (patron: patron) => void,
-  open_mentorship: () => {}
+  open_mentorship: () => void
 }
-function Patron({ patron_prop, update_fetched }: { patron_prop: patron, update_fetched: (patron: patron) => void }) {
+function Patron(props: patron_props) {
   const session_id = useAuth().session_id;
-  const [patron, setPatron] = useState(patron_prop)
+  const [patron, setPatron] = useState(props.patron_prop)
   const [expanded, setExpanded] = useState(false);
   const [preferences, setPreferences] = useState(false);
   const [situation, setSituation] = useState(false);
@@ -126,9 +126,12 @@ function Patron({ patron_prop, update_fetched }: { patron_prop: patron, update_f
     })
   }
   const handle_update_success = () => {
-    update_fetched(edited)
+    props.update_fetched(edited)
     setPatron(edited)
     setEdit(false)
+  }
+  const on_link = () => {
+    props.open_mentorship();
   }
 
   return (
@@ -322,7 +325,7 @@ function Patron({ patron_prop, update_fetched }: { patron_prop: patron, update_f
           </Stack>
         </Stack>
         <Stack direction='row' alignContent='space-around' justifyContent='space-evenly'>
-          <Button>Link to Mentorship</Button>
+          <Button onClick={on_link}>Link to Mentorship</Button>
           <Button onClick={on_edit}>{edit ? "Cancel Edit" : "Edit"}</Button>
           {edit && <Button onClick={on_submit_changes}>Save Changes</Button>}
         </Stack>

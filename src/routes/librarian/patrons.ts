@@ -55,7 +55,7 @@ patrons.post('/update_info', async (req: Request, res: Response) => {
     library_discovery_method = $11,
     library_travel_time = $12,
     desired_library_resources = $13,
-    library_attendance_goal = $14
+    library_attendance_goal = $14,
     mentorship_user_id = $16
     WHERE
     patron_id = $15;
