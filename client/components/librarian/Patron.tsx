@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Box, IconButton, Paper, Stack, Typography, Container, Divider, Button, TextField, Radio, RadioGroup, FormControl, SelectChangeEvent, FormLabel, Select, MenuItem, FormGroup, FormControlLabel, Chip } from "@mui/material";
+import { Box, IconButton, Paper, Stack, Typography, Container, Divider, Button, TextField, Radio, RadioGroup, FormControl, SelectChangeEvent, FormLabel, Select, MenuItem, FormGroup, FormControlLabel, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { patron, library_attendance_goal, barriers_to_education, desired_library_resource } from "../../types";
 import { options } from "./form_option_objects";
 import { KeyboardArrowDown, } from "@mui/icons-material";
@@ -24,6 +24,7 @@ function Patron(props: patron_props) {
   const [goalSelect, setGoalSelect] = useState('' as library_attendance_goal | "");
   const [barrierSelect, setBarrierSelect] = useState('' as barriers_to_education | "");
   const [resourceSelect, setResourceSelect] = useState('' as desired_library_resource | "");
+  const [open_dialog, set_open_dialog] = useState(false);
 
   const on_expand = () => {
     setExpanded(!expanded);
@@ -134,6 +135,15 @@ function Patron(props: patron_props) {
   const on_link = () => {
     props.open_mentorship();
   }
+  const close_dialog_handler = () => {
+    set_open_dialog(false);
+  };
+  const open_dialog_handler = () => {
+    set_open_dialog(true);
+  };
+  const disaffiliate = () => {
+    close_dialog_handler()
+  };
 
   return (
     <Paper>
@@ -149,7 +159,20 @@ function Patron(props: patron_props) {
         </Stack>
       </Box>
       {expanded && <Container>
+        <Dialog open={open_dialog}
+          onClose={close_dialog_handler}>
+          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Would you like to disconnect this patron from the mentorship account they're currently connected to?
+            </DialogContentText>
+            <DialogActions>
+              <Button onClick={close_dialog_handler}>Cancel</Button>
+              <Button onClick={disaffiliate}>Yes, Disconnect</Button>
+            </DialogActions>
+          </DialogContent>
 
+        </Dialog>
 
         <Stack direction='row' divider={<Divider orientation="vertical" flexItem />} alignContent='center' justifyContent='space-evenly'>
           <Container id='Left'>
@@ -327,7 +350,8 @@ function Patron(props: patron_props) {
           </Stack>
         </Stack>
         <Stack direction='row' alignContent='space-around' justifyContent='space-evenly'>
-          <Button onClick={on_link}>Link to Mentorship</Button>
+          {patron.profile.mentorship_user_id == undefined && <Button onClick={on_link}>Link to Mentorship</Button>}
+          {patron.profile.mentorship_user_id && <Button onClick={open_dialog_handler}>Disconnect from Mentorship</Button>}
           <Button onClick={on_edit}>{edit ? "Cancel Edit" : "Edit"}</Button>
           {edit && <Button onClick={on_submit_changes}>Save Changes</Button>}
         </Stack>
