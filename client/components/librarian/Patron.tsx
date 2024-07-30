@@ -6,6 +6,7 @@ import { options } from "./form_option_objects";
 import { KeyboardArrowDown, } from "@mui/icons-material";
 import { ChangeEvent } from "react";
 import { useAuth } from "./AuthContext";
+import CheckIcon from '@mui/icons-material/Check';
 
 export type patron_props = {
   patron_prop: patron,
@@ -144,6 +145,7 @@ function Patron(props: patron_props) {
           <IconButton onClick={on_expand} sx={{ justifyContent: 'flex-end' }} >
             <KeyboardArrowDown />
           </IconButton>
+          {patron.profile.mentorship_user_id && <CheckIcon></CheckIcon>}
         </Stack>
       </Box>
       {expanded && <Container>

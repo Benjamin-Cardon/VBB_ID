@@ -159,6 +159,7 @@ patrons.get('/list', async (req: Request, res: Response) => {
         library_travel_time: sql_patron.library_travel_time,
         desired_library_resource: sql_patron.desired_library_resources,
         library_attendance_goal: sql_patron.library_attendance_goal,
+        mentorship_user_id: sql_patron.mentorship_user_id
       }
     }
   })
