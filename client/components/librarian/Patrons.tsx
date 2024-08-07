@@ -145,6 +145,20 @@ function Patrons(patron_props: props) {
   function on_close_mentorship() {
     set_mentorship_modal_open(false);
   }
+  const on_change_display = (patrons: Array<patron>) => {
+    set_displayed_patrons(patrons);
+  }
+  function update_display_on_select(mentorship_patron: mentorship_info, patron: patron) {
+    const new_displayed = displayed_patrons.map((val: patron) => {
+      if (val.patron_id == patron.patron_id) {
+        console.log("WE FOUND IT", val, mentorship_patron)
+        return { ...patron, profile: { ...patron.profile, mentorship_user_id: mentorship_patron.user_id } };
+      }
+      return val
+    })
+    console.log("New Displayed Patrons", new_displayed)
+    on_change_display(new_displayed);
+  }
 
   function handle_select_creator(patron: patron) {
     return () => (mentorship_patron: mentorship_info) => {
@@ -169,7 +183,8 @@ function Patrons(patron_props: props) {
             }
           }
           if (stringified_body == "Update Successful") {
-            console.log("Success! Now we need to make a handler")
+            on_close_mentorship();
+            update_display_on_select(mentorship_patron, patron);
           } else {
             console.log("No auth success. ")
           }
