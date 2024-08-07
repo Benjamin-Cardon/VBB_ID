@@ -132,17 +132,50 @@ function Patron(props: patron_props) {
     setPatron(edited)
     setEdit(false)
   }
+
   const on_link = () => {
     props.open_mentorship();
   }
+
   const close_dialog_handler = () => {
     set_open_dialog(false);
   };
+
   const open_dialog_handler = () => {
     set_open_dialog(true);
   };
+
   const disaffiliate = () => {
-    close_dialog_handler()
+    let disaffiliated: patron = { ...patron, profile: { ...patron.profile, mentorship_user_id: "0" } }
+    fetch("http://localhost:3000/patrons/update_info", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ modified_patron_profile: disaffiliated, session_id })
+    }).then(async (res) => {
+      if (res.body != null) {
+        let reader = res.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let stringified_body: string = '';
+        while (true) {
+          let { done, value } = await reader.read();
+          if (value != undefined) {
+            stringified_body = stringified_body.concat(decoder.decode(value));
+          }
+          if (done) {
+            break;
+          }
+        }
+        if (stringified_body == "Update Successful") {
+          props.update_fetched({ ...patron, profile: { ...patron.profile, mentorship_user_id: undefined } });
+          setPatron({ ...patron, profile: { ...patron.profile, mentorship_user_id: undefined } })
+          close_dialog_handler();
+        } else {
+          console.log("No auth success. ")
+        }
+      }
+    })
   };
 
   return (

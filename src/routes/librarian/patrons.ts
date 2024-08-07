@@ -76,7 +76,7 @@ patrons.post('/update_info', async (req: Request, res: Response) => {
       modified_patron_profile.profile.desired_library_resource,
       modified_patron_profile.profile.library_attendance_goal,
       modified_patron_profile.patron_id,
-      modified_patron_profile.profile.mentorship_user_id
+      modified_patron_profile.profile.mentorship_user_id == 0 ? null : modified_patron_profile.profile.mentorship_user_id
     ])
     console.log(update_result)
     res.status(200);
