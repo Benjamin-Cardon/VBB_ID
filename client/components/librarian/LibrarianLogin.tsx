@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEventHandler, FormEvent } from 'react';
 import React from 'react';
-import { TextField, InputLabel, MenuItem, FormControl, Select, Button, Box, SelectChangeEvent, Alert, Snackbar, Input, InputAdornment, IconButton, Paper, Typography, } from '@mui/material';
+import { TextField, Container, InputLabel, MenuItem, FormControl, Select, Button, Box, SelectChangeEvent, Alert, Snackbar, Input, InputAdornment, IconButton, Paper, Typography, } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { login_state } from '../../types';
@@ -116,55 +116,76 @@ function LibrarianLogin(library_props: props) {
     }
   }
   return (<div>
-    <Box id="loginContainer">
+    <Box id="AuthContainer" sx={{
+      height: '100vh',
+      width: '100vw',
+      backgroundColor: 'wheat'
+    }}>
+
       <Box
         sx={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          width: '50px',
-          height: '50px',
-        }}
-      ><Logo />
+          position: 'relative',
+          width: '100%',
+          minHeight: '100px',
+          backgroundColor: 'white',
+          display: 'flex',
+          justifyContent: 'center', // Center the content horizontally
+          alignItems: 'center', // Center the content vertically
+          zIndex: '99',
+          padding: '0 20px',
+        }} id="Header"
+      >
+        <Box id='LogoBox' sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-start' }}>
+          <Logo />
+        </Box >
       </Box>
-      <Paper id="loginForm">
-        <Typography>Librarian Login</Typography>
-        <TextField variant="outlined" value={form_state.username} onChange={on_form_change('username')}>Username</TextField>
-        <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-          <InputLabel htmlFor="standard-adornment-password">Password</InputLabel>
-          <Input
-            id="standard-adornment-password"
-            type={showPassword ? 'text' : 'password'}
-            value={form_state.password}
-            onChange={on_form_change('password')}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            }
-          />
-        </FormControl>
+      <Box id="MainContent" sx={{ marginTop: '80px', paddingLeft: "24px", maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', display: 'flex' }}>
+        <Paper id="loginForm" sx={{ maxWidth: '320px', marginTop: '-32px', marginBottom: '-32px', backgroundColor: 'white', color: 'black', borderWidth: '1px', borderStyle: 'solid', borderColor: 'lightgray', padding: '24px' }} >
+          <Container>
+            <Typography sx={{ textAlign: 'center' }}>
+              Librarian Login
+            </Typography>
 
-        <FormControl>
-          <InputLabel id='select-library-label'>Library</InputLabel>
-          <Select
-            labelId='select-library-label'
-            id="select-library"
-            label='Library'
-            value={obj.library}
-            onChange={on_select_change}>
-            {libraries.map((l) => <MenuItem value={l.name}>{l.name}</MenuItem>)}
-          </Select>
-        </FormControl>
-        <Button onClick={on_submit_login}>Log in</Button>
-      </Paper>
-      <Paper id="loginInfos"></Paper>
+            <TextField variant="outlined" value={form_state.username} onChange={on_form_change('username')}>Username</TextField>
+            <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+              <InputLabel htmlFor="standard-adornment-password">Password</InputLabel>
+              <Input
+                id="standard-adornment-password"
+                type={showPassword ? 'text' : 'password'}
+                value={form_state.password}
+                onChange={on_form_change('password')}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+
+            <FormControl>
+              <InputLabel id='select-library-label'>Library</InputLabel>
+              <Select
+                labelId='select-library-label'
+                id="select-library"
+                label='Library'
+                value={obj.library}
+                onChange={on_select_change}>
+                {libraries.map((l) => <MenuItem value={l.name}>{l.name}</MenuItem>)}
+              </Select>
+            </FormControl>
+            <Button onClick={on_submit_login}>Log in</Button>
+          </Container>
+        </Paper>
+        <Paper id="loginInfos" sx={{ backgroundColor: 'white', color: 'black', flexGrow: '1', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px' }}></Paper>
+      </Box>
+
+
     </Box>
     <Snackbar open={open}
       autoHideDuration={6000}
