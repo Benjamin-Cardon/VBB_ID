@@ -42,7 +42,7 @@ patrons.post('/update_info', async (req: Request, res: Response) => {
   console.log("Recieved Request to change patron info")
   const { modified_patron_profile, session_id } = req.body;
   console.log(modified_patron_profile)
-  const result = await client.query("SELECT librarian_id FROM librarian_logins WHERE session_id = $1", [session_id])
+  const result = await client.query("SELECT librarian_id FROM id_system.librarian_logins WHERE session_id = $1", [session_id])
   if (result.rows.length > 0) {
     const query_string = `UPDATE public.patrons
     SET
@@ -95,7 +95,7 @@ patrons.post('/update_info', async (req: Request, res: Response) => {
 patrons.get('/list', async (req: Request, res: Response) => {
   let session_id = req.query.session;
   console.log("Recieved Request for List:", session_id)
-  const login_entry = await client.query("SELECT * FROM librarian_logins WHERE session_id = $1", [session_id])
+  const login_entry = await client.query("SELECT * FROM id_system.librarian_logins WHERE session_id = $1", [session_id])
   let librarian_id, library_id;
   if (login_entry.rows.length == 0) {
     res.send("No such session");
@@ -104,7 +104,7 @@ patrons.get('/list', async (req: Request, res: Response) => {
     librarian_id = login_entry.rows[0].librarian_id;
   }
   console.log("Librarian ID", librarian_id)
-  const librarian_entry = await client.query("SELECT * FROM librarians WHERE id = $1", [librarian_id])
+  const librarian_entry = await client.query("SELECT * FROM id_system.librarians WHERE id = $1", [librarian_id])
   if (librarian_entry.rows.length == 0) {
     res.send("Internal Database Error: Mismatch of librarian ID's ");
     res.status(400);
@@ -113,29 +113,29 @@ patrons.get('/list', async (req: Request, res: Response) => {
   }
   let query_string = `
     SELECT
-      patrons.*,
+      id_system.patrons.*,
       COALESCE(attendance_counts.attendance_count, 0) AS attendance_count,
       attendance_counts.most_recent_attendance
     FROM
-      public.patrons
+      id_system.patrons
     LEFT JOIN (
       SELECT
-          attendance_log.patron_id,
-          COUNT(attendance_log.id) AS attendance_count,
-          MAX(attendance_log.time_attended) AS most_recent_attendance
+          id_system.attendance_log.patron_id,
+          COUNT(id_system.attendance_log.id) AS attendance_count,
+          MAX(id_system.attendance_log.time_attended) AS most_recent_attendance
       FROM
-          attendance_log
+          id_system.attendance_log
       GROUP BY
-          attendance_log.patron_id
+          id_system.attendance_log.patron_id
     ) AS attendance_counts
     ON
-      patrons.patron_id = attendance_counts.patron_id
+      id_system.patrons.patron_id = attendance_counts.patron_id
     JOIN
-      public.libraries
+      libraries_library
     ON
-      patrons.library_id = libraries.id
+      id_system.patrons.library_id = libraries_library.id
     WHERE
-      libraries.id = $1 -- Replace with the specific library ID you want to filter by
+      libraries_library.id = $1 -- Replace with the specific library ID you want to filter by
     ORDER BY
       first_name ASC;`
   const patron_list = await client.query(query_string, [library_id])

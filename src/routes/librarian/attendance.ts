@@ -6,16 +6,16 @@ import client from "../../db/client";
 attendance.post('/event', async (req: Request, res: Response) => {
   const { code, session_id } = req.body;
   // TODO: Adjust this to have some kind of time-out;
-  const result = await client.query("SELECT * FROM librarian_logins WHERE session_id = $1", [session_id])
+  const result = await client.query("SELECT * FROM id_system.librarian_logins WHERE session_id = $1", [session_id])
   if (result.rows.length > 0) {
-    const check_code = await client.query("SELECT patron_id, library_id FROM patrons WHERE patron_id = $1", [code]);
+    const check_code = await client.query("SELECT patron_id, library_id FROM id_system.patrons WHERE patron_id = $1", [code]);
     if (check_code.rowCount == 0) {
       res.send("No such code.")
     } else {
       // TODO manage timezones.
-      const prev_login = await client.query("SELECT * FROM attendance_log WHERE patron_id = $1 AND DATE(time_attended) = CURRENT_DATE", [code])
+      const prev_login = await client.query("SELECT * FROM id_system.attendance_log WHERE patron_id = $1 AND DATE(time_attended) = CURRENT_DATE", [code])
       if (prev_login.rows.length == 0) {
-        const insert_login = await client.query("INSERT INTO attendance_log (patron_id, library_id) VALUES($1, $2)", [code, check_code.rows[0].library_id])
+        const insert_login = await client.query("INSERT INTO id_system.attendance_log (patron_id, library_id) VALUES($1, $2)", [code, check_code.rows[0].library_id])
 
         res.send("Patron Logged in")
       } else if (prev_login.rows.length > 0) {
