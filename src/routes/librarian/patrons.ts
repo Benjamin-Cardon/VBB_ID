@@ -9,29 +9,33 @@ patrons.post('/register', async (req: Request, res: Response) => {
   console.log("Recieved Request to Register")
   const { register_form, session_id } = req.body;
   console.log(register_form);
-  const result = await client.query("SELECT librarian_id FROM librarian_logins WHERE session_id = $1", [session_id])
-  if (result.rows.length > 0) {
-    let librarian_id = result.rows[0].librarian_id;
-    const librarian = (await client.query("SELECT * FROM librarians WHERE id = $1", [librarian_id])).rows[0];
-    const library = (await client.query("SELECT * FROM libraries WHERE id = $1", [librarian.library_id])).rows[0];
-    console.log(register_form);
-    console.log(librarian)
-    console.log(library);
-    let id = create_id(library.id_count, register_form.student == "Student");
-    console.log(register_form.desired_library_resources)
-    const add_person = await client.query("INSERT INTO patrons(patron_id, library_id, first_name, last_name, gender, date_of_birth, grade_level, immediate_family_members, family_status, family_members_with_income, barriers_to_education, family_support_level, favorite_subject, percieved_most_useful_subject, percieved_most_difficult_subject, library_discovery_method,library_travel_time, desired_library_resources, library_attendance_goal, is_student, mentorship_user_id ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,$21)", [
-      id, library.id, register_form.first_name, register_form.last_name, register_form.gender, register_form.date, register_form.grade_level, register_form.family_members, register_form.family_status, register_form.family_members_with_income, register_form.barriers_to_education, register_form.family_support_level, register_form.favorite_subject, register_form.percieved_most_useful_subject, register_form.percieved_most_difficult_subject, register_form.library_discovery_method, register_form.library_travel_time, register_form.desired_library_resources, register_form.goals, register_form.student == "Student", register_form.mentorship_user_id
-    ])
-    console.log("Added Person");
-    const update_count = await client.query('UPDATE libraries SET id_count = $1 WHERE id = $2', [library.id_count + 1, library.id]);
-    console.log("Count Updated;")
-    res.status(200);
-    res.send(id);
-    //create_id(library);
-  } else {
+  const result = await client.query("SELECT librarian_id FROM id_system.librarian_logins WHERE session_id = $1", [session_id])
+
+  if (result.rows.length == 0) {
     res.status(401);
     res.send("Unauthorized Session");
   }
+
+  const librarian_id = result.rows[0].librarian_id;
+  const librarian = (await client.query("SELECT * FROM id_system.librarians WHERE id = $1", [librarian_id])).rows[0];
+  const library = (await client.query("SELECT * FROM libraries_library WHERE id = $1", [librarian.library_id])).rows[0];
+  const count_exists = (await client.query("SELECT COUNT(*) from id_system.library_patron_count_incrementer WHERE library_id = $1", [librarian.library_id])).rows[0].count > 0;
+
+  if (!count_exists) {
+    await client.query("INSERT INTO id_system.library_patron_count_incrementer VALUES ($1 , 0)", [librarian.library_id])
+  }
+
+  const incremented_count = count_exists ? Number((await client.query("SELECT * from id_system.library_patron_count_incrementer WHERE library_id = $1", [librarian.library_id])).rows[0].patron_count_incrementer) + 1 : 1;
+  const id = create_id(incremented_count, register_form.student == "Student");
+  await client.query("INSERT INTO id_system.patrons(patron_id, library_id, first_name, last_name, gender, date_of_birth, grade_level, immediate_family_members, family_status, family_members_with_income, barriers_to_education, family_support_level, favorite_subject, percieved_most_useful_subject, percieved_most_difficult_subject, library_discovery_method,library_travel_time, desired_library_resources, library_attendance_goal, is_student, user_id ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,$21)", [
+    id, library.id, register_form.first_name, register_form.last_name, register_form.gender, register_form.date, register_form.grade_level, register_form.family_members, register_form.family_status, register_form.family_members_with_income, register_form.barriers_to_education, register_form.family_support_level, register_form.favorite_subject, register_form.percieved_most_useful_subject, register_form.percieved_most_difficult_subject, register_form.library_discovery_method, register_form.library_travel_time, register_form.desired_library_resources, register_form.goals, register_form.student == "Student", register_form.mentorship_user_id
+  ])
+  await client.query('UPDATE id_system.library_patron_count_incrementer SET patron_count_incrementer = $1 WHERE library_id = $2', [incremented_count, library.id]);
+
+  res.status(200);
+  res.send(id);
+  //create_id(library);
+
 })
 
 patrons.post('/update_info', async (req: Request, res: Response) => {

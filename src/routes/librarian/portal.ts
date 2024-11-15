@@ -1,11 +1,7 @@
 const express = require('express')
 const portal: Router = express.Router()
 import { Router, Request, Response } from "express";
-import client, { mentorship } from "../../db/client";
-mentorship.connect()
-  .then(() => {
-    console.log("Connected to Mentorship")
-  })
+import client from "../../db/client";
 
 portal.get('/student_info', async (req: Request, res: Response) => {
   const { session_id } = req.query;
@@ -41,7 +37,7 @@ portal.get('/student_info', async (req: Request, res: Response) => {
      AND profiles_studentprofile.assigned_library_id=$1`;
     const affiliated_patrons_result = await client.query(query_patrons, [mentorship_library_result.rows[0].id])
     //console.log("Ids which have already been affiliated", affiliated_patrons_result)
-    const mentorship_patrons_result = await mentorship.query(query_mentorship, [mentorship_library_result.rows[0].mentorship_library_id])
+    const mentorship_patrons_result = await client.query(query_mentorship, [mentorship_library_result.rows[0].mentorship_library_id])
     //console.log("This is the mentorship patrons result:", mentorship_patrons_result.rows)
     let mentorship_patrons = mentorship_patrons_result.rows;
     for (let patron of mentorship_patrons) {

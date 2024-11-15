@@ -8,8 +8,7 @@ import portal from "./routes/librarian/portal";
 import client from './db/client';
 const bodyParser = require('body-parser')
 var session = require('express-session')
-
-dotenv.config();
+import 'dotenv/config';
 
 client.connect().then(
   () => {

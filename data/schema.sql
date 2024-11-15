@@ -1,11 +1,13 @@
-CREATE TABLE IF NOT EXISTS public.patrons
+CREATE SCHEMA IF NOT EXISTS id_system;
+
+CREATE TABLE IF NOT EXISTS id_system.patrons
 (
     patron_id character varying(255) COLLATE pg_catalog."default" PRIMARY KEY NOT NULL,
     library_id bigint NOT NULL,
+	is_student boolean NOT NULL,
+	user_id bigint,
     first_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     last_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    is_student boolean NOT NULL,
-    mentorship_user_id bigint,
     gender character varying(255) COLLATE pg_catalog."default",
     date_of_birth date,
     grade_level character varying(255) COLLATE pg_catalog."default",
@@ -23,10 +25,10 @@ CREATE TABLE IF NOT EXISTS public.patrons
     library_attendance_goal TEXT[]
 );
 
-CREATE TABLE IF NOT EXISTS public.librarians
+CREATE TABLE IF NOT EXISTS id_system.librarians
 (
-    id bigserial NOT NULL,
-    mentorship_user_id bigint,
+    id bigserial Unique NOT NULL,
+    user_id bigint,
     library_id bigint NOT NULL,
     password character varying(255) COLLATE pg_catalog."default",
     username character varying(255) COLLATE pg_catalog."default",
@@ -36,7 +38,7 @@ CREATE TABLE IF NOT EXISTS public.librarians
     current_librarian boolean
 );
 
-CREATE TABLE IF NOT EXISTS public.attendance_log
+CREATE TABLE IF NOT EXISTS id_system.attendance_log
 (
   id bigserial NOT NULL,
   patron_id character varying(255) COLLATE pg_catalog."default" NOT NULL,
@@ -44,66 +46,51 @@ CREATE TABLE IF NOT EXISTS public.attendance_log
   time_attended date
 );
 
-CREATE TABLE IF NOT EXISTS public.libraries
-(
-    id bigserial NOT NULL,
-    name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    mentorship_library_id bigint,
-    address_1 character varying(255) COLLATE pg_catalog."default",
-    address_2 character varying(255) COLLATE pg_catalog."default",
-    city character varying(255) COLLATE pg_catalog."default",
-    country character varying(255) COLLATE pg_catalog."default",
-    notes character varying(255) COLLATE pg_catalog."default",
-    "poBoxNumber" character varying(255) COLLATE pg_catalog."default",
-    postal_code character varying(255) COLLATE pg_catalog."default",
-    state_province character varying(255) COLLATE pg_catalog."default"
-);
 
-Create TABLE IF NOT EXISTS public.librarian_logins(
+Create TABLE IF NOT EXISTS id_system.librarian_logins(
 	id bigserial NOT NULL,
 	session_id character varying(255) COLLATE pg_catalog."default" UNIQUE NOT NULL
 );
 
-ALTER TABLE librarians
-ADD CONSTRAINT pk_librarians_id PRIMARY KEY (id);
 
-ALTER TABLE librarian_logins
+ALTER TABLE id_system.librarian_logins
 ADD PRIMARY KEY (session_id);
 
-ALTER TABLE attendance_log
+ALTER TABLE id_system.attendance_log
 ADD PRIMARY KEY (id);
 
-ALTER TABLE libraries
-ADD PRIMARY KEY (id);
+ALTER TABLE id_system.librarians
+ADD CONSTRAINT fk_librarians_belong_to_libraries FOREIGN KEY (library_id) REFERENCES libraries_library(id);
 
-ALTER TABLE librarians
-ADD CONSTRAINT fk_librarians_belong_to_libraries FOREIGN KEY (library_id) REFERENCES libraries(id);
+ALTER TABLE id_system.patrons
+ADD CONSTRAINT fk_patrons_belong_to_libraries FOREIGN KEY (library_id) REFERENCES libraries_library(id);
 
-ALTER TABLE patrons
-ADD CONSTRAINT fk_patrons_belong_to_libraries FOREIGN KEY (library_id) REFERENCES libraries(id);
+ALTER TABLE id_system.attendance_log
+ADD CONSTRAINT fk_attendance_done_by_patron FOREIGN KEY (patron_id) REFERENCES id_system.patrons(patron_id);
 
+ALTER TABLE id_system.attendance_log
+ADD CONSTRAINT fk_attendance_at_library FOREIGN KEY (library_id) REFERENCES libraries_library(id);
 
-ALTER TABLE attendance_log
-ADD CONSTRAINT fk_attendance_done_by_patron FOREIGN KEY (patron_id) REFERENCES patrons(patron_id);
-
-ALTER TABLE attendance_log
-ADD CONSTRAINT fk_attendance_at_library FOREIGN KEY (library_id) REFERENCES libraries(id);
-
-ALTER TABLE librarian_logins
+ALTER TABLE id_system.librarian_logins
 ADD COLUMN librarian_id BIGINT, -- Change the data type according to your requirements
-ADD CONSTRAINT fk_librarian_id FOREIGN KEY (librarian_id) REFERENCES librarians(id);
+ADD CONSTRAINT fk_librarian_id FOREIGN KEY (librarian_id) REFERENCES id_system.librarians(id);
 
-ALTER TABLE librarian_logins
+ALTER TABLE id_system.librarian_logins
 ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
-ALTER TABLE attendance_log
+ALTER TABLE id_system.attendance_log
 ALTER COLUMN time_attended SET DEFAULT CURRENT_TIMESTAMP;
 
-ALTER TABLE public.libraries
-ADD COLUMN id_count integer NOT NULL DEFAULT 0;
+CREATE TABLE id_system.library_patron_count_incrementer(
+    library_id bigint unique,
+    patron_count_incrementer bigint
+);
 
+ALTER TABLE id_system.library_patron_count_incrementer
+ADD PRIMARY KEY (library_id);
 
-
+ALTER TABLE id_system.library_patron_count_incrementer
+ADD CONSTRAINT fk_patroncounts_belong_to_libraries FOREIGN KEY (library_id) REFERENCES libraries_library(id);
 
 /*CREATE TABLE IF NOT EXISTS public.profiles_studentprofile
 (
