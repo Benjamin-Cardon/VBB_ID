@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { AuthProvider } from "./AuthContext";
 import LibrarianLogin from "./LibrarianLogin";
+import Attendance from "./Attendance";
+import NavBar from "./NavBar";
 
 
 export type props = {
@@ -14,9 +16,10 @@ const App: React.FC = () => {
   }
   return (
     <AuthProvider>
-      <div>
-        <LibrarianLogin></LibrarianLogin>
-      </div>
+      <>
+        <NavBar></NavBar>
+        <Attendance />
+      </>
     </AuthProvider>)
 };
 
