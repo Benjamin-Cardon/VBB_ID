@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./components/Librarian.tsx";
+import App from "./components/Librarian";
 
 ReactDOM.render(
   <React.StrictMode>

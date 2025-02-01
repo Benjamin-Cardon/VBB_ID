@@ -2,9 +2,10 @@ const path = require("path");
 
 module.exports = {
   entry: {
-    librarian: "./client/librarian.tsx",
+    //librarian: "./client/librarian.tsx",
     admin: "./client/admin.tsx",
-    data: "./client/data.tsx"
+    data: "./client/data.tsx",
+    stylin: './client2/librarian.tsx'
   }
   ,
   module: {

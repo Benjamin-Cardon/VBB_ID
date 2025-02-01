@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { AuthProvider } from "./AuthContext";
+import LibrarianLogin from "./LibrarianLogin";
 
 
 export type props = {
@@ -14,6 +15,7 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <div>
+        <LibrarianLogin></LibrarianLogin>
       </div>
     </AuthProvider>)
 };

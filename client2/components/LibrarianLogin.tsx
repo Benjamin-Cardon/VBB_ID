@@ -2,12 +2,13 @@ import React from "react";
 
 const styles: { LoginFrame: React.CSSProperties; LoginPanel: React.CSSProperties; LoginTitle: React.CSSProperties; LoginInput: React.CSSProperties; LoginButton: React.CSSProperties } = {
   // @ts-ignore
-  LoginFrame: { width: '100vw', height: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center', backgroundImage: 'url("/background1.jpg")' },
+  LoginFrame: { width: '100vw', height: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center', backgroundImage: 'url("background1.jpg")', backgroundSize: 'cover', backgroundPosition: 'center', backdropFilter: 'blur(10px)', zIndex: '-1' },
   LoginPanel: {
-    justifySelf: 'center', width: '25%', height: '40%', borderRadius: '15px', backdropFilter: 'blur(10.4px)', backgroundColor: 'rgba(255, 255, 255, 0.35)', boxShadow: '0px 10px 15px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem'
+    justifySelf: 'center', width: '30%', height: '40%', borderRadius: '15px', backdropFilter: 'blur(10.4px)', backgroundColor: 'rgba(255, 255, 255, 0.35)', boxShadow: '0px 10px 15px rgba(0, 0, 0, 0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', zIndex: '1'
   },
-  LoginTitle: { color: 'black', fontWeight: 'bold', fontSize: '32px', marginBottom: '20px', textAlign: 'center', },
+  LoginTitle: { color: 'black', fontWeight: 'bold', fontSize: '36px', marginBottom: '20px', textAlign: 'center', },
   LoginInput: {
+    boxSizing: 'border-box',
     padding: '10px',
     marginBottom: '10px',
     width: '100%',
@@ -17,10 +18,10 @@ const styles: { LoginFrame: React.CSSProperties; LoginPanel: React.CSSProperties
   },
   LoginButton: {
     padding: '10px 20px',
-    backgroundColor: '#4CAF50',
+    backgroundColor: 'black',
     color: 'white',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '10px',
     fontSize: '1.2rem',
     cursor: 'pointer',
     width: '100%',
@@ -38,7 +39,7 @@ function LibrarianLogin() {
           <option>Option 2</option>
           <option>Option 3</option>
         </select>
-        <button style={styles.LoginButton}></button>
+        <button style={styles.LoginButton}>Login</button>
       </div>
     </div>)
 }
